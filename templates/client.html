@@ -6,18 +6,18 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			var username = prompt("Please enter your username", "Login (no password)");
+			var username = prompt("Please enter your username");
 			$(document).ready(function(){
 				var socket = io.connect('http://127.0.0.1:5000');
 				socket.on('connect', function(){
-                   socket.send(username + ' entered the chatroom.');
+                   socket.send('entered the chatroom.');
 				});
                 $('#send').on('click', function(){
                     socket.send($('#user_message').val());
                     $('#user_message').val('');
                 });
                 socket.on('message', function(msg){
-                  $('#messages').append('<li>'username+"> "+msg+'</li>');
+                  $('#messages').append('<li>'+username+"> "+msg+'</li>');
                 });
 			});
 		</script>
