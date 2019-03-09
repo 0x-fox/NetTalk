@@ -17,7 +17,7 @@
                     $('#user_message').val('');
                 });
                 socket.on('message', function(msg){
-                  $('#messages').append('<li>'username+msg+'</li>');
+                  $('#messages').append('<li>'username+"> "+msg+'</li>');
                 });
 			});
 		</script>
