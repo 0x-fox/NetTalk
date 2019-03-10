@@ -1,12 +1,13 @@
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>NetTalk</title>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	</head>
-	<body>
+	<body id="bg">
 		<style>
-		span {
+		span.b {
 			text-shadow: 2px, 2px, black;
 			font-size: 20px;
 		}
@@ -17,32 +18,50 @@
 			font-family: Arial, Helvetica, sans-serif;
 		}
 		#bg {
-			min-height: 100%;
-			min-width: 1024px;
-		
-			width: 100%;
-			height: auto;
-			
-			position: fixed;
-			top: 0;
-			left: 0;
-
-			
+			height: 800px;
 			background-color: CornflowerBlue;
 			background-image: linear-gradient(CornflowerBlue, Fuchsia);
+		}
 		body {
 			background-color: Fuchsia;
 		} 
+		button {
+			background-image: linear-gradient(GoldenRod, Gold);
+			border: none;
+			color: white;
+			padding: 4px 30px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+		input {
+			width: 960px;
+			padding: 4px 2px;
+			display: inline-block;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+		span.credits {
+			font-size: 12px;
+			color: light_gray;
+		}
 		</style>
 		<script type="text/javascript">
 			username = {};
+			canuse = true;
 			function getRandomInt(max) {
 				return Math.floor(Math.random() * Math.floor(max));
 			}
-			do{
-				username = prompt("Please enter your username");
+				username = prompt("Please enter your username (or cancel to enter as guest)");
+			if(username == null || username == ""){
+				username = "Guest" + getRandomInt(32768)
 			}
-			while(username == "" || username == null)
 			$(document).ready(function(){
 			var socket = io.connect('http://127.0.0.1:5000');
 			socket.on('connect', function(){
@@ -56,27 +75,35 @@
 						return;
 					}
 				}
-                socket.send('<br><b><span style=\'txt\'>'+username+"</b>> "+$('#user_message').val()+'</span>');
-                $('#user_message').val('');
+				
+				socket.send('<br><b><span style=\'txt\'>'+username+"</b>> "+$('#user_message').val()+'</span>');
+				
             });
             socket.on('message', function(fmsg){
-			  $('#messages').append(fmsg);
+			  document.getElementById('messages').innerHTML += fmsg;
             });
 			});
 			
 		</script>
 		<hr />
-		<div id="bg" style="overflow-y:scroll">
-		<ul id="messages"></ul>
+		<div id="mscroll">
+		<span id="messages"></span>
 		</div>
 		<hr />
 		<input type="text" id="user_message">
-		<button id="send">Send</button><br><br><span>You can also use the enter key</span>
+		<button id="send">Send</button><br><br><span class="b">You can also use the enter key</span><br>
+		
+		<br><br><br><br>
+		<span style="font-size: 72px">NetTalk</span>
+		<span class="credits">Made by CreepiYT (github : Caty-the-AI) and Ad2017 (github : ad2017gd)</span>
 		<script>
 		window.setInterval(function() {
-		var elem = document.getElementById('bg');
-		elem.scrollTop = elem.scrollHeight;
-		}, 1200);
+			var elem = document.getElementById('mscroll');
+			elem.scrollTop = elem.scrollHeight;
+		}, 250);
+		$("#mscroll").css("max-height", 300);
+		$("#mscroll").css("overflow", "auto");
+		$("#mscroll").css("height", 300);
 		var input = document.getElementById("user_message");
 		input.addEventListener("keyup", function(event) {
 			if (event.keyCode === 13) {
