@@ -5,24 +5,82 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	</head>
 	<body>
+		<style>
+		span {
+			text-shadow: 2px, 2px, black;
+			font-size: 20px;
+		}
+		
+		txt {
+			text-transform: capitalize;
+			letter-spacing: 2px;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+		#bg {
+			height: 200px;
+			background-color: CornflowerBlue;
+			background-image: linear-gradient(CornflowerBlue, Fuchsia);
+		body {
+			background-color: Fuchsia;
+		} 
+		</style>
 		<script type="text/javascript">
-			var username = prompt("Please enter your username");
+			username = {};
+			function getRandomInt(max) {
+				return Math.floor(Math.random() * Math.floor(max));
+			}
+			do{
+				username = prompt("Please enter your username");
+			}
+			while(username == "" || username == null)
 			$(document).ready(function(){
-				var socket = io.connect('http://127.0.0.1:5000');
-				socket.on('connect', function(){
-                   socket.send('entered the chatroom.');
-				});
-                $('#send').on('click', function(){
-                    socket.send($('#user_message').val());
-                    $('#user_message').val('');
-                });
-                socket.on('message', function(msg){
-                  $('#messages').append('<li>'+username+"> "+msg+'</li>');
-                });
+			var socket = io.connect('http://127.0.0.1:5000');
+			socket.on('connect', function(){
+                socket.send('<b>' + username + '</b> entered the chatroom.');
 			});
+            $('#send').on('click', function(){
+				if($('#user_message').val() == "") {return}
+				if($('#user_message').val() == "\n") {return}
+				if($('#user_message').val().startsWith(" ")) {
+					if($('#user_message').val().endsWith(" ")) {
+						return;
+					}
+				}
+                socket.send('<br><b><span style=\'txt\'>'+username+"</b>> "+$('#user_message').val()+'</span>');
+                $('#user_message').val('');
+            });
+            socket.on('message', function(fmsg){
+			  $('#messages').append(fmsg);
+            });
+			});
+			
 		</script>
+		<hr />
+		<div id="bg" style="overflow-y:scroll">
 		<ul id="messages"></ul>
+		</div>
+		<hr />
 		<input type="text" id="user_message">
-		<button id="send">-></button>
+		<button id="send">Send</button><br><br><span>You can also use the enter key</span>
+		<script>
+		window.setInterval(function() {
+		var elem = document.getElementById('bg');
+		elem.scrollTop = elem.scrollHeight;
+		}, 1200);
+		var input = document.getElementById("user_message");
+		input.addEventListener("keyup", function(event) {
+			if (event.keyCode === 13) {
+				event.preventDefault();
+				if($('#user_message').val() == "") {return}
+				if($('#user_message').val() == "\n") {return}
+				if($('#user_message').val().startsWith(" ")) {
+					if($('#user_message').val().endsWith(" ")) {
+						return
+					}
+				}
+				document.getElementById("send").click();
+			}
+		});
+		</script>
 	</body>
 </html>
