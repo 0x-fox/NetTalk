@@ -27,13 +27,26 @@
 			font-family: Arial, Helvetica, sans-serif;
 		}
 		#bg {
-			height: 800px;
-			background-color: CornflowerBlue;
-			background-image: linear-gradient(CornflowerBlue, Fuchsia);
+			height: 100%;
+			width: 100%
+			background-color: rgb(69,75,0);
+			background-image: linear-gradient(90deg, rgba(69,75,0,1) 0%, rgba(255,249,5,1) 35%, rgba(243,247,17,1) 65%, rgba(69,75,0,1) 100%);
 		}
 		body {
-			background-color: Fuchsia;
+			background-color: Gold;
 		} 
+		
+		html {
+		  -webkit-box-sizing: border-box;
+		  -moz-box-sizing: border-box;
+		  box-sizing: border-box;
+		}
+		*, *:before, *:after {
+			-webkit-box-sizing: inherit;
+			-moz-box-sizing: inherit;
+			box-sizing: inherit;
+		}
+		
 		button {
 			background-image: linear-gradient(GoldenRod, Gold);
 			border: none;
@@ -97,30 +110,38 @@
 		<div id="mscroll">
 		<span id="messages"></span>
 		</div>
+		<script type="text/javascript">
+			function toggleTheme() {
+				document.getElementById("bg").style.backgroundColor = "gray";
+				document.getElementById("bg").style.backgroundImage = "none";
+				document.getElementById("Darkmode").style.display = "none";
+			}
+		</script>
 		<input type="text" id="user_message">
 		<button id="send">Send</button>
-		<script>
-		window.setInterval(function() {
-			var elem = document.getElementById('mscroll');
-			elem.scrollTop = elem.scrollHeight;
-		}, 250);
-		$("#mscroll").css("max-height", 300);
-		$("#mscroll").css("overflow", "auto");
-		$("#mscroll").css("height", 300);
-		var input = document.getElementById("user_message");
-		input.addEventListener("keyup", function(event) {
-			if (event.keyCode === 13) {
-				event.preventDefault();
-				if($('#user_message').val() == "") {return}
-				if($('#user_message').val() == "\n") {return}
-				if($('#user_message').val().startsWith(" ")) {
-					if($('#user_message').val().endsWith(" ")) {
-						return
+		<button onclick="toggleTheme();" id="Darkmode">Darkmode</button>
+		<script type="text/javascript">
+			window.setInterval(function() {
+				var elem = document.getElementById('mscroll');
+				elem.scrollTop = elem.scrollHeight;
+			}, 250);
+			$("#mscroll").css("max-height", 300);
+			$("#mscroll").css("overflow", "auto");
+			$("#mscroll").css("height", 300);
+			var input = document.getElementById("user_message");
+			input.addEventListener("keyup", function(event) {
+				if (event.keyCode === 13) {
+					event.preventDefault();
+					if($('#user_message').val() == "") {return}
+					if($('#user_message').val() == "\n") {return}
+					if($('#user_message').val().startsWith(" ")) {
+						if($('#user_message').val().endsWith(" ")) {
+							return
+						}
 					}
+					document.getElementById("send").click();
 				}
-				document.getElementById("send").click();
-			}
-		});
+			});
 		</script>
 	</body>
 </html>
