@@ -2,11 +2,20 @@
 <html>
 	<head>
 		<title>NetTalk</title>
+		<!-- <image src="{{ url_for('static', filename='NetTalkLogo.png') }}"> -->
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	</head>
 	<body id="bg">
 		<style>
+		
+		body {
+			heigth: 100% !important;
+			min-height: 100% !important;
+			width: 100% !important;
+			min-width: 100% !important;
+		}
+		
 		span.b {
 			text-shadow: 2px, 2px, black;
 			font-size: 20px;
@@ -85,17 +94,11 @@
 			});
 			
 		</script>
-		<hr />
 		<div id="mscroll">
 		<span id="messages"></span>
 		</div>
-		<hr />
 		<input type="text" id="user_message">
-		<button id="send">Send</button><br><br><span class="b">You can also use the enter key</span><br>
-		
-		<br><br><br><br>
-		<span style="font-size: 72px">NetTalk</span>
-		<span class="credits">Made by CreepiYT (github : Caty-the-AI) and Ad2017 (github : ad2017gd)</span>
+		<button id="send">Send</button>
 		<script>
 		window.setInterval(function() {
 			var elem = document.getElementById('mscroll');
