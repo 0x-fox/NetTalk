@@ -4,4 +4,4 @@ We want to make a web-chatting app for users to talk with friends
 or other people.
 
 
-WARNING!! DO NOT CHANGE THE NAME OF THE 'templates' FOLDER! YOU CANT SET A CUSTOM PATH IN FLASK. (horrible imo)
+# WARNING!! DO NOT CHANGE THE NAME OF THE 'templates' FOLDER! YOU CANT SET A CUSTOM PATH IN FLASK. (horrible imo)
