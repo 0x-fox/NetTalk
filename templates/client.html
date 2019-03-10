@@ -36,7 +36,7 @@
 			$(document).ready(function(){
 			var socket = io.connect('http://127.0.0.1:5000');
 			socket.on('connect', function(){
-                socket.send('<b>' + username + '</b> entered the chatroom.');
+                socket.send('<br><b>' + username + '</b> entered the chatroom.');
 			});
             $('#send').on('click', function(){
 				if($('#user_message').val() == "") {return}
