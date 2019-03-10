@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html>
 	<head>
 		<title>NetTalk</title>
@@ -9,6 +9,8 @@
 	<body id="bg">
 		<style>
 		
+<<<<<<< HEAD
+=======
 		body {
 			heigth: 100% !important;
 			min-height: 100% !important;
@@ -16,6 +18,7 @@
 			min-width: 100% !important;
 		}
 		
+>>>>>>> 75e469796570f94f8d209f0d010f4c54c2426872
 		span.b {
 			text-shadow: 2px, 2px, black;
 			font-size: 20px;
@@ -27,6 +30,11 @@
 			font-family: Arial, Helvetica, sans-serif;
 		}
 		#bg {
+			background-color: rgb(69,75,0);
+			background-image: linear-gradient(Fuchsia, CornflowerBlue);
+			margin: 2;
+			background-repeat: no-repeat;
+			background-attachment: fixed;
 			height: 100%;
 			width: 100%
 			background-color: rgb(69,75,0);
@@ -36,16 +44,6 @@
 			background-color: Gold;
 		} 
 		
-		html {
-		  -webkit-box-sizing: border-box;
-		  -moz-box-sizing: border-box;
-		  box-sizing: border-box;
-		}
-		*, *:before, *:after {
-			-webkit-box-sizing: inherit;
-			-moz-box-sizing: inherit;
-			box-sizing: inherit;
-		}
 		
 		button {
 			background-image: linear-gradient(GoldenRod, Gold);
@@ -73,14 +71,25 @@
 			font-size: 12px;
 			color: light_gray;
 		}
+		a.credits {
+			font-size: 14px;
+			color: light_gray;
+		}
 		</style>
 		<script type="text/javascript">
 			username = {};
+			users = [];
 			canuse = true;
 			function getRandomInt(max) {
 				return Math.floor(Math.random() * Math.floor(max));
 			}
-				username = prompt("Please enter your username (or cancel to enter as guest)");
+			username = prompt("Please enter your username (or cancel to enter as guest)");
+			for(i=0; i<users.length; i++){
+				if(username == users[i].toString) {
+					alert("User exists. Logging in as Guest");
+					username = null;
+				}
+			}
 			if(username == null || username == ""){
 				username = "Guest" + getRandomInt(32768)
 			}
@@ -88,18 +97,14 @@
 			var socket = io.connect('http://127.0.0.1:5000');
 			socket.on('connect', function(){
                 socket.send('<br><b>' + username + '</b> entered the chatroom.');
+				socket.send('<br><b>NetTalk Bot</b>> Hello, ' + username + "!");
+				users.push(username);
 			});
             $('#send').on('click', function(){
-				if($('#user_message').val() == "") {return}
-				if($('#user_message').val() == "\n") {return}
-				if($('#user_message').val().startsWith(" ")) {
-					if($('#user_message').val().endsWith(" ")) {
-						return;
-					}
+				if(document.getElementById('user_message').value != "") {
+					socket.send('<br><b><span style=\'txt\'>'+username+"</b>> "+document.getElementById('user_message').value+'</span>');
+					document.getElementById("send_message").reset()
 				}
-				
-				socket.send('<br><b><span style=\'txt\'>'+username+"</b>> "+$('#user_message').val()+'</span>');
-				
             });
             socket.on('message', function(fmsg){
 			  document.getElementById('messages').innerHTML += fmsg;
@@ -110,12 +115,51 @@
 		<div id="mscroll">
 		<span id="messages"></span>
 		</div>
+<<<<<<< HEAD
+		<hr />
+		<form id="send_message" action="javascript:void(0);">
+		<input autocomplete="off" type="text" id="user_message" name="inputbox">
+		<button id="send" name="send">Send</button>
+		</form>
+		<button onclick="darkMode()" id="darkmode">Dark mode (OFF)</button>
+		<br>
+		<span class="credits">Made by CreepiYT (Caty-the-AI) and Ad2017 (ad2017gd)</span><br>
+		<a class="credits" href="https://github.com/Caty-the-AI/NetTalk">GitHub repo</a>
 		<script type="text/javascript">
-			function toggleTheme() {
-				document.getElementById("bg").style.backgroundColor = "gray";
-				document.getElementById("bg").style.backgroundImage = "none";
-				document.getElementById("Darkmode").style.display = "none";
+			function darkMode(){
+				button = document.getElementById('darkmode')
+				if(button.innerHTML == "Dark mode (OFF)"){
+					$("#bg").css("background-image", "none");
+					$("#bg").css("background-color", "#202020");
+					$("button").css("background-image", "none");
+					$("button").css("background-color", "#000000");
+					$("input").css("background-color", "#484848");
+					$("span").css("color", "#FFFFFF");
+					button.innerHTML = "Dark mode (ON)";
+				} else {
+					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
+					$("#bg").css("background-color", "rgb(69,75,0)");
+					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
+					$("input").css("background-color", "#FFFFFF");
+					$("span").css("color", "#000000");
+					button.innerHTML = "Dark mode (OFF)";
+				}
 			}
+			window.setInterval(function() {
+				var elem = document.getElementById('mscroll');
+				elem.scrollTop = elem.scrollHeight;
+			}, 250);
+			$("#mscroll").css("max-height", 300);
+			$("#mscroll").css("overflow", "auto");
+			$("#mscroll").css("height", 300);
+			var input = document.getElementById("user_message");
+			input.addEventListener("keyup", function(event) {
+				if (event.keyCode === 13) {
+					if($('#user_message').val() != "") {
+						document.getElementById("send").click();
+						document.getElementById("send_message").reset()
+					}
+				}
 		</script>
 		<input type="text" id="user_message">
 		<button id="send">Send</button>
@@ -141,6 +185,7 @@
 					}
 					document.getElementById("send").click();
 				}
+>>>>>>> 75e469796570f94f8d209f0d010f4c54c2426872
 			});
 		</script>
 	</body>
