@@ -82,7 +82,7 @@
 				username = "Guest" + getRandomInt(32768)
 			}
 			$(document).ready(function(){
-			var socket = io.connect('http://127.0.0.1:5000');
+			var socket = io.connect('http://' + document.domain + ":" + location.port);
 			socket.on('connect', function(){
                 socket.send('<br><b>' + username + '</b> entered the chatroom.');
 				socket.send('<br><b>NetTalk Bot</b>> Hello, ' + username + "!");
@@ -114,6 +114,7 @@
 		<br>
 		<span class="credits">Made by CreepiYT (Caty-the-AI) and Ad2017 (ad2017gd)</span><br>
 		<a class="credits" href="https://github.com/Caty-the-AI/NetTalk">GitHub repo</a>
+		
 		<script>
 			$("#mscroll").css("max-height", 300);
 			$("#mscroll").css("overflow", "auto");
