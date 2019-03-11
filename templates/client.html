@@ -8,12 +8,12 @@
 	</head>
 	<body id="bg">
 		<style>
-
+		
 		span.b {
 			text-shadow: 2px, 2px, black;
 			font-size: 20px;
 		}
-
+		
 		txt {
 			text-transform: capitalize;
 			letter-spacing: 2px;
@@ -28,9 +28,9 @@
 		}
 		body {
 			background-color: Gold;
-		}
-
-
+		} 
+		
+		
 		button {
 			background-image: linear-gradient(GoldenRod, Gold);
 			border: none;
@@ -77,15 +77,15 @@
 				}
 			}
 			alert("MOBILE USERS, if you see a black page, try moving around or zooming. Sorry for the inconvenience!")
-			alert("Also, if Core [Bot] does not greet you, you are not properly connected. Try to close the tab and visit this webpage again. You may now continue without interruptions!")
+			alert("Also, if Core Bot does not greet you, you are not properly connected. Try to close the tab and visit this webpage again. You may now continue without interruptions!")
 			if(username == null || username == ""){
 				username = "Guest" + getRandomInt(32768)
 			}
 			$(document).ready(function(){
-			var socket = io.connect('http://127.0.0.1:5000');
+			var socket = io.connect('http://' + document.domain + ":" + location.port);
 			socket.on('connect', function(){
                 socket.send('<br><b>' + username + '</b> entered the chatroom.');
-				socket.send('<br><b>Core [Bot]</b>> Hello, ' + username + "!");
+				socket.send('<br><b>Core Bot</b>> Hello, ' + username + "!");
 				users.push(username);
 			});
             $('#send').on('click', function(){
@@ -98,7 +98,7 @@
 			  document.getElementById('messages').innerHTML += fmsg;
             });
 			});
-
+			
 		</script>
 		<div id="mscroll">
 		<span id="messages"></span>
@@ -114,6 +114,7 @@
 		<br>
 		<span class="credits">Made by CreepiYT (Caty-the-AI) and Ad2017 (ad2017gd)</span><br>
 		<a class="credits" href="https://github.com/Caty-the-AI/NetTalk">GitHub repo</a>
+		
 		<script>
 			$("#mscroll").css("max-height", 300);
 			$("#mscroll").css("overflow", "auto");
