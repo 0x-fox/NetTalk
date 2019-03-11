@@ -82,7 +82,7 @@
 				username = "Guest" + getRandomInt(32768)
 			}
 			$(document).ready(function(){
-			var socket = io.connect('http://5.14.143.244:2129');
+			var socket = io.connect('http://127.0.0.1:5000');
 			socket.on('connect', function(){
                 socket.send('<br><b>' + username + '</b> entered the chatroom.');
 				socket.send('<br><b>NetTalk Bot</b>> Hello, ' + username + "!");
