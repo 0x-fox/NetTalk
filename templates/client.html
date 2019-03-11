@@ -76,11 +76,13 @@
 					username = null;
 				}
 			}
+			alert("MOBILE USERS, if you see a black page, try moving around or zooming. Sorry for the inconvenience!")
+			alert("Also, if NetTalk Bot does not greet you, you are not properly connected. Try to close the tab and visit this webpage again. You may now continue without interruptions!")
 			if(username == null || username == ""){
 				username = "Guest" + getRandomInt(32768)
 			}
 			$(document).ready(function(){
-			var socket = io.connect('http://127.0.0.1:5000');
+			var socket = io.connect('http://5.14.143.244:2129');
 			socket.on('connect', function(){
                 socket.send('<br><b>' + username + '</b> entered the chatroom.');
 				socket.send('<br><b>NetTalk Bot</b>> Hello, ' + username + "!");
