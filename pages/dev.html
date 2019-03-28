@@ -2,7 +2,6 @@
 <html>
 	<head>
 		<title>NetTalk</title>
-		<!-- <image src="{{ url_for('static', filename='NetTalkLogo.png') }}"> -->
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	</head>
@@ -62,7 +61,14 @@
 			color: light_gray;
 		}
 		</style>
+		<audio id="ping">
+			<source src="/assets/ping.mp3" type="audio/mpeg">
+		</audio>
 		<script type="text/javascript">
+			function isHTML(str) {
+				var doc = new DOMParser().parseFromString(str, "text/html");
+				return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
+			}
 			username = {};
 			users = [];
 			canuse = true;
@@ -76,49 +82,105 @@
 					username = null;
 				}
 			}
-			alert("MOBILE USERS, if you see a black page, try moving around or zooming. Sorry for the inconvenience!")
-			alert("Also, if Core Bot does not greet you, you are not properly connected. Try to close the tab and visit this webpage again. You may now continue without interruptions!")
-			if(username == null || username == ""){
+			if(username == null || username == "" || isHTML(username)){
 				username = "Guest" + getRandomInt(32768)
 			}
+			
 			$(document).ready(function(){
 			var socket = io.connect('http://' + document.domain + ":" + location.port);
 			socket.on('connect', function(){
                 socket.send('<br><b>' + username + '</b> entered the chatroom.');
 				socket.send('<br><b>Core Bot</b>> Hello, ' + username + "!");
-				users.push(username);
+				socket.emit('get_users', username)
+			socket.on('disconnect', function(){
+                socket.send('<br><b>' + username + '</b> disconnected.');
+				socket.send('<br><b>Core Bot</b>> Goodbye, ' + username + "!");
+				socket.emit('get_users', username)
 			});
+			});
+			socket.emit('logon')
+			socket.on('login', function(password){
+				input = -1
+				do {
+					input = prompt("please enter automatically generated password.")
+					close()
+				} while (input != password)
+			})
+			// stuff //
+			String.prototype.replaceAll = function(search, replacement) {
+			var target = this;
+			return target.replace(new RegExp(search, 'g'), replacement);
+			};
+
+			function replaceAll(str, map){
+				for(key in map){
+					str = str.replaceAll(key, map[key]);
+				}
+				return str;
+			}
+			// --- //
             $('#send').on('click', function(){
-				if(document.getElementById('user_message').value != "") {
-					socket.send('<br><b><span style=\'txt\'>'+username+"</b>> "+document.getElementById('user_message').value+'</span>');
+				msg = document.getElementById('user_message').value
+				emojicodes = [":grin:", ":joy:", ":smiley:", ":wink:", ":sunglasses:", ":neutral:", ":sad:", ":angry:", ":cry:"]
+				emojis = ["😀", "😃", "😂", "🙂", "😉", "😇", "😋", "😎", "😑", "🙁", "😡", "😱", "😭", "😥"]
+				emoji = {':grin:' : '😀', ':joy:' : '😂', ':smiley:' : '🙂', ':wink:' : '😉', ':sunglasses:' : '😎', ':neutral:' : '😑', ':sad:' : '🙁', ':angry:' : '😡', ':cry:' : '😥', ':shrug:' : '🤷', ':thinking:' : '🤔'}
+				if(isHTML(msg)) {
+					return;
+				}
+				if(!msg.startsWith(' ') && msg != ''){
+					msg_ = replaceAll(msg, emoji)
+					if(isHTML(msg_)) {
+						return;
+					}
+					socket.emit('message', '<br><b><span style=\'txt\'>'+username+"</b>> "+msg_+'</span>', username);
 					document.getElementById("send_message").reset()
 				}
-            });
-            socket.on('message', function(fmsg){
+			});
+            socket.on('message', function(fmsg, usern){
+			if (!document.onfocus){
+				if(usern!=username){
+					document.getElementById("ping").play()
+				}
+			}
 			  document.getElementById('messages').innerHTML += fmsg;
             });
 			});
-			
 		</script>
+		<span>dev chat</span>
+		<span class="credits">Made by CreepiYT (Caty-the-AI) and Ad2017 (ad2017gd)</span><br>
+		<a class="credits" href="https://github.com/Caty-the-AI/NetTalk">GitHub repo</a>
+		<hr />
 		<div id="mscroll">
 		<span id="messages"></span>
 		</div>
 		<hr />
-		<form id="send_message" action="javascript:void(0);">
-		<input autocomplete="off" type="text" id="user_message" name="inputbox">
-		<button id="send" name="send">Send</button>
+		<form id="send_message" action="javascript::void(0)">
+		<input id="user_message" list="emojis" name="inputBox">
+		<button id="send">Send</button>
+		<datalist id="emojis">
+		<option value=":grin:">
+		<option value=":joy:">
+		<option value=":smiley:">
+		<option value=":sunglasses:">
+		<option value=":neutral:">
+		<option value=":sad:">
+		<option value=":angry:">
+		<option value=":cry:">
+		<option value=":shrug:">
+		<option value=":thinking:">
+		</datalist>
 		</form>
-		<button onclick="darkMode()" id="darkmode">Dark mode (OFF)</button>
+		<button onclick="darkMode()" id="darkmode" name="send">Dark mode (OFF)</button>
 		<br>
 		<br>
 		<br>
-		<span class="credits">Made by CreepiYT (Caty-the-AI) and Ad2017 (ad2017gd)</span><br>
-		<a class="credits" href="https://github.com/Caty-the-AI/NetTalk">GitHub repo</a>
-		
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		<script>
-			$("#mscroll").css("max-height", 300);
+			$("#mscroll").css("max-height", 400);
 			$("#mscroll").css("overflow", "auto");
-			$("#mscroll").css("height", 300);
+			$("#mscroll").css("height", 400);
+			
 			function darkMode(){
 				button = document.getElementById('darkmode')
 				if(button.innerHTML == "Dark mode (OFF)"){
@@ -141,7 +203,7 @@
 			window.setInterval(function() {
 				var elem = document.getElementById('mscroll');
 				elem.scrollTop = elem.scrollHeight;
-			}, 250);
+			}, 500);
 			var input = document.getElementById("user_message");
 			input.addEventListener("keyup", function(event) {
 				if (event.keyCode === 13) {
