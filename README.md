@@ -3,6 +3,6 @@ NetTalk is a chatting project started by me (CreepiYT/Caty-the-AI) and Ad2017 (g
 We want to make a web-chatting app for users to talk with friends
 or other people.
 
-
-# WARNING! 
-DO NOT CHANGE THE NAME OF THE 'templates' FOLDER! YOU CAN'T SET A CUSTOM PATH IN FLASK. (horrible imo)
+# Testing
+If you would like to test NetTalk until the Public Release, please join our discord server! 
+http://discord.gg/E5VkHVs
