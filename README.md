@@ -7,4 +7,4 @@ or other people.
 
 # Testing
 If you would like to test NetTalk until the Public Release, please join our discord server! 
-http://discord.gg/E5VkHVs
+https://discord.gg/xAGgYge
