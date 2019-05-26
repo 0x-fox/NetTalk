@@ -1,4 +1,6 @@
-
+<audio id="ping">
+	<source src="/assets/ping.mp3" type="audio/mpeg">
+</audio>
 <html>
 	<head>
 		<title>NetTalk</title>
@@ -56,49 +58,82 @@
 			font-size: 12px;
 			color: light_gray;
 		}
+		span.credits+ {
+			font-size: 20px;
+			color: black;
+		}
 		a.credits {
 			font-size: 14px;
 			color: light_gray;
 		}
 		</style>
-		<audio id="ping">
-			<source src="/assets/ping.mp3" type="audio/mpeg">
-		</audio>
 		<script type="text/javascript">
+			var pings;
+			let socket;
+			var userlist;
+			
+	
 			function isHTML(str) {
 				var doc = new DOMParser().parseFromString(str, "text/html");
 				return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
 			}
 			username = {};
-			users = [];
+			var users;
 			canuse = true;
 			function getRandomInt(max) {
 				return Math.floor(Math.random() * Math.floor(max));
 			}
-			username = prompt("Please enter your username (or cancel to enter as guest)");
-			for(i=0; i<users.length; i++){
-				if(username == users[i].toString) {
-					alert("User exists. Logging in as Guest");
-					username = null;
-				}
-			}
-			alert("MOBILE USERS, if you see a black page, try moving around or zooming. Sorry for the inconvenience!")
-			alert("Also, if Core Bot does not greet you, you are not properly connected. Try to close the tab and visit this webpage again. You may now continue without interruptions!")
-			if(username == null || username == "" || isHTML(username)){
-				username = "Guest" + getRandomInt(32768)
-			}
+
 			
 			$(document).ready(function(){
-			var socket = io.connect('http://' + document.domain + ":" + location.port);
-			socket.on('connect', function(){
-                socket.send('<br><b>' + username + '</b> entered the chatroom.');
-				socket.send('<br><b>Core Bot</b>> Hello, ' + username + "!");
-				socket.emit('get_users', username)
-			socket.on('disconnect', function(){
-                socket.send('<br><b>' + username + '</b> disconnected.');
-				socket.send('<br><b>Core Bot</b>> Goodbye, ' + username + "!");
-				socket.emit('get_users', username)
+			var go = prompt("By using this service, you agree to the ToS. To read them, please enter 1, so you will be NOT connected. To continue normally, enter 0")
+			if(go == 1){
+				const socket = "disabled"
+			}
+			if(go == 0){
+				socket = io.connect('http://' + document.domain + ":" + location.port, {'sync disconnect on unload': true });
+			}
+			setInterval(function(){
+				socket.emit('request_user_list')
+			}, 250)
+			socket.on('receive_user_list', function(user_list){
+				unformatted_userlist = user_list.split(',')
+				userlist = []
+				for(i=0; i<unformatted_userlist.length; i++){
+					userlist.push("<br>" + unformatted_userlist[i])
+				}
+				document.getElementById('user_list').innerHTML = userlist.toString()
+				users = user_list.split(',')
+				if(users[0] != "Core Bot"){
+					users.unshift("Core Bot")
+				}
 			});
+			len = 33
+			
+			do {
+				username = prompt("Please enter your username (or leave blank to enter as guest)");
+
+				len = username.length
+			} while(len > 32)
+			//console.log(users)
+			//for(i=0; i<users.length; i++){
+				//console.log(username)
+				//console.log(users[i].toString())
+				//console.log(users[i])
+				//if(username == users[i].toString()) {
+					//alert("User exists. Logging in as Guest");
+					//username = null;
+				//}
+			//}
+			
+			if(username == null || username == "" || isHTML(username) || username == undefined){
+				username = "Guest" + getRandomInt(32768)
+			}
+			console.log(username)
+			socket.emit('get_username', username)
+			socket.emit('logon', username)
+			socket.on('connect', function(){
+				socket.emit('request_user_list', username)
 			});
 			// stuff //
 			String.prototype.replaceAll = function(search, replacement) {
@@ -115,9 +150,7 @@
 			// --- //
             $('#send').on('click', function(){
 				msg = document.getElementById('user_message').value
-				emojicodes = [":grin:", ":joy:", ":smiley:", ":wink:", ":sunglasses:", ":neutral:", ":sad:", ":angry:", ":cry:"]
-				emojis = ["😀", "😃", "😂", "🙂", "😉", "😇", "😋", "😎", "😑", "🙁", "😡", "😱", "😭", "😥"]
-				emoji = {':grin:' : '😀', ':joy:' : '😂', ':smiley:' : '🙂', ':wink:' : '😉', ':sunglasses:' : '😎', ':neutral:' : '😑', ':sad:' : '🙁', ':angry:' : '😡', ':cry:' : '😥', ':shrug:' : '🤷', ':thinking:' : '🤔'}
+				emoji = {':grin:' : '😀', ':joy:' : '😂', ':smiley:' : '🙂', ':wink:' : '😉', ':sunglasses:' : '😎', ':neutral:' : '😑', ':sad:' : '🙁', ':angry:' : '😡', ':cry:' : '😥', ':shrug:' : '🤷', ':thinking:' : '🤔', ':100:' : '💯', ':fire:' : '🔥'}
 				if(isHTML(msg)) {
 					return;
 				}
@@ -130,22 +163,36 @@
 					document.getElementById("send_message").reset()
 				}
 			});
+			pings = 1
             socket.on('message', function(fmsg, usern){
 			if (!document.onfocus){
 				if(usern!=username){
-					document.getElementById("ping").play()
+					if(pings == 1){
+						document.getElementById("ping").play()
+					}
 				}
 			}
 			  document.getElementById('messages').innerHTML += fmsg;
             });
+		
+			});
+			$(function() {
+				$('input, textarea, select').focus(function() {
+					selectedInput = this;
+				}).blur(function(){
+					selectedInput = null;
+				});
 			});
 		</script>
-		<span class="credits">Made by CreepiYT (0x-fox) and Ad2017 (ad2017gd)</span><br>
-		<a class="credits" href="https://github.com/Caty-the-AI/NetTalk">GitHub repo</a>
+		<span class="credits">Made by CreepiYT (Caty-the-AI) and Ad2017 (ad2017gd)</span><br>
+		<a class="credits" href="https://github.com/Caty-the-AI/NetTalk">GitHub repo</a><br>
+		<span class="credits+">By using this service, you agree to the </span><a href="http://5.14.41.201:7209/pages/tos.html" class="credits">ToS</a>
+		<hr />
 		<div id="mscroll">
 		<span id="messages"></span>
+		</div>
 		<hr />
-		<form id="send_message" action="javascript::void(0)">
+		<form autocomplete="off" id="send_message" action="javascript:void(0)">
 		<input id="user_message" list="emojis" name="inputBox">
 		<button id="send">Send</button>
 		<datalist id="emojis">
@@ -159,19 +206,38 @@
 		<option value=":cry:">
 		<option value=":shrug:">
 		<option value=":thinking:">
+		<option value=":100:">
+		<option value=":fire:">
 		</datalist>
 		</form>
-		<button onclick="darkMode()" id="darkmode" name="send">Dark mode (OFF)</button>
+		<button onclick="darkMode()" id="darkmode">Dark mode (OFF)</button>
+		<button onclick="mute()" id="mute">Pings (ON)</button>
+		<div id="mscroll2">
+		<span>User list:</span>
+		<span id="user_list"></span>
+		</div>
 		<br>
 		<br>
 		<br>
-		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		<script>
 			$("#mscroll").css("max-height", 400);
 			$("#mscroll").css("overflow", "auto");
 			$("#mscroll").css("height", 400);
 			
+			$("#mscroll2").css("max-height", 100);
+			$("#mscroll2").css("overflow", "auto");
+			$("#mscroll2").css("height", 100);
+			$("#mscroll2").css("text-align", "right");
+			
+			function mute(){
+				if(pings == 0){
+					pings = 1
+					document.getElementById('mute').innerHTML = "Pings (ON)"
+				} else {
+					pings = 0
+					document.getElementById('mute').innerHTML = "Pings (OFF)"
+				}
+			}
 			function darkMode(){
 				button = document.getElementById('darkmode')
 				if(button.innerHTML == "Dark mode (OFF)"){
@@ -191,6 +257,8 @@
 					button.innerHTML = "Dark mode (OFF)";
 				}
 			}
+			
+			
 			window.setInterval(function() {
 				var elem = document.getElementById('mscroll');
 				elem.scrollTop = elem.scrollHeight;
@@ -207,3 +275,6 @@
 		</script>
 	</body>
 </html>
+<audio id="ping">
+	<source src="/assets/ping.mp3" type="audio/mpeg">
+</audio>
