@@ -15,17 +15,14 @@ app.get('/', function(req, res){
 });
 
 app.get('/pages/process_get', function(req, res){
-        response = {
-            author : req.query.author,
-            username : req.query.user,
-            reason : req.query.reason
-           }
-	console.log(response)
-        res.end(JSON.stringify(response));
+    response = {
+		author : req.query.author,
+		username : req.query.user,
+        reason : req.query.reason
+    }
+	//console.log(response)
+    res.end(JSON.stringify(response));
 });
-
-
-
 
 function randomstr(len) {
 	return Math.random().toString(36).substring(len)
@@ -42,7 +39,7 @@ io.on('connection', function(socket){
 	}
 	var user;
 	var address = socket.handshake.address;
-	console.log(address)
+	//console.log(address)
 	socket.on('get_username', function(username){
 		if(users[0] != "Core Bot"){
 			users.unshift("Core Bot")
@@ -52,7 +49,7 @@ io.on('connection', function(socket){
 			users.unshift("Core Bot")
 		}
 		user = username
-		console.log(users)
+		//console.log(users)
 	})
 	socket.on('logon', function(username){
 		io.send('<br><b>' + username + '</b> entered the chatroom.');
@@ -60,13 +57,13 @@ io.on('connection', function(socket){
 	})
 	socket.on('message', function(msg, username){
 		io.emit('message', msg, username);
-		console.log(msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", ""))
+		//console.log(msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", ""))
 	});
 	socket.on('disconnect', function(){
 		socket.emit('disconnect_', user)
 		users.splice(users.indexOf(user), 1)
-		console.log(users)
-		console.log('disconnect ' + address)
+		//console.log(users)
+		//console.log('disconnect ' + address)
 	})
 	socket.on('connection', function(socket){
 		io.emit('connection', socket)
