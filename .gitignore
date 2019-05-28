@@ -1,3 +1,4 @@
 nodemodules/*
+nodemodules/express/*
 *.json
 *.md
