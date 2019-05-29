@@ -71,12 +71,6 @@
 			var pings;
 			let socket;
 			var userlist;
-			
-	
-			function isHTML(str) {
-				var doc = new DOMParser().parseFromString(str, "text/html");
-				return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
-			}
 			username = {};
 			var users;
 			canuse = true;
@@ -115,20 +109,6 @@
 
 				len = username.length
 			} while(len > 32)
-			//console.log(users)
-			//for(i=0; i<users.length; i++){
-				//console.log(username)
-				//console.log(users[i].toString())
-				//console.log(users[i])
-				//if(username == users[i].toString()) {
-					//alert("User exists. Logging in as Guest");
-					//username = null;
-				//}
-			//}
-			
-			if(username == null || username == "" || isHTML(username) || username == undefined){
-				username = "Guest" + getRandomInt(32768)
-			}
 			console.log(username)
 			socket.emit('get_username', username)
 			socket.emit('logon', username)
@@ -151,14 +131,8 @@
             $('#send').on('click', function(){
 				msg = document.getElementById('user_message').value
 				emoji = {':grin:' : '😀', ':joy:' : '😂', ':smiley:' : '🙂', ':wink:' : '😉', ':sunglasses:' : '😎', ':neutral:' : '😑', ':sad:' : '🙁', ':angry:' : '😡', ':cry:' : '😥', ':shrug:' : '🤷', ':thinking:' : '🤔', ':100:' : '💯', ':fire:' : '🔥'}
-				if(isHTML(msg)) {
-					return;
-				}
 				if(!msg.startsWith(' ') && msg != ''){
 					msg_ = replaceAll(msg, emoji)
-					if(isHTML(msg_)) {
-						return;
-					}
 					socket.emit('message', '<br><b><span style=\'txt\'>'+username+"</b>> "+msg_+'</span>', username);
 					document.getElementById("send_message").reset()
 				}

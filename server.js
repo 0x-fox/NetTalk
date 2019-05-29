@@ -15,6 +15,7 @@ class User {
 	}
 }
 
+var filterHTML = function(s){return s.replace(/>/g,"&gt;").replace(/</g,"&lt;")};
 var Core_Bot = new User("Core Bot");
 
 app.use(express.static(path.join(__dirname, '/')));
@@ -50,16 +51,20 @@ io.on('connection', function(socket){
 	var address = socket.handshake.address;
 	//console.log(address)
 	socket.on('get_username', function(username){
-		user = username
+		username = filterHTML(username);
+		user = username;
 		user = new User(user);
-		//console.log(users)
 	})
 	socket.on('logon', function(username){
-		io.send('<br><b>' + username + '</b> has ntered the chatroom.');
+		username = filterHTML(username);
+		io.send('<br><b>' + username + '</b> has entered the chatroom.');
 		io.send('<br><b>Core Bot</b>> Hello, ' + username + "!")
 	})
 	socket.on('message', function(msg, username){
-		io.emit('message', msg, username);
+		msg = msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", "");
+		msg = filterHTML(msg);
+		username = filterHTML(username);
+		io.emit('message', "<br><b><span style='txt'>"+msg+"</b></span>", username);
 		//console.log(msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", ""))
 	});
 	socket.on('disconnect', function(){
