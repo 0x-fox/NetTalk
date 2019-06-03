@@ -9,7 +9,6 @@ var banned = []
 
 class User {
 	constructor(name) {
-		this.id = (users.length + 1);
 		this.name = name;
 		users.push(this);
 	}
