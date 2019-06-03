@@ -52,8 +52,7 @@ io.on('connection', function(socket){
 	//console.log(address)
 	socket.on('get_username', function(username){
 		username = filterHTML(username);
-		user = username;
-		user = new User(user);
+		user = new User(username);
 	})
 	socket.on('logon', function(username){
 		username = filterHTML(username);
