@@ -1,12 +1,21 @@
 var express = require('express');
+var sha256 = require('js-sha256');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var path = require('path')
 var port = process.env.PORT || 5000;
 var users = []
+const fs = require('fs');
 var banned = []
+var connectedips = []
+function lrem(arr, value) {
 
+   return arr.filter(function(ele){
+       return ele != value;
+   });
+
+}
 class User {
 	constructor(name) {
 		this.name = name;
@@ -20,7 +29,7 @@ var Core_Bot = new User("Core Bot");
 app.use(express.static(path.join(__dirname, '/')));
 
 app.get('/', function(req, res){
-	res.sendFile(__dirname + '/pages/client.html');
+	res.sendFile(__dirname + '/log.html');
 });
 
 app.get('/pages/process_get', function(req, res){
@@ -29,8 +38,8 @@ app.get('/pages/process_get', function(req, res){
 		username : req.query.user,
         reason : req.query.reason
     }
-	//console.log(response)
-    res.end(JSON.stringify(response));
+	console.log(response)
+    res.end("Reported.");
 });
 
 function randomstr(len) {
@@ -47,31 +56,72 @@ io.on('connection', function(socket){
 		}
 	}
 	var user;
-	var address = socket.handshake.address;
-	//console.log(address)
+	var address = socket.handshake.address.replace('::ffff:', '').replace('::', '')
+	connectedips.push(address)
+	socket.on('checkConnection', function(username){
+		m=0
+		for(i=0; i<connectedips.length; i++){
+		if(connectedips[i] == address){
+			m++
+		}
+		console.log(m)
+		console.log(connectedips)
+		if(m>1){
+			socket.emit('connectionResult', true)
+			console.log(true)
+		} else {
+			for(i=0; i<users.length; i++){
+			try{
+			if(users[1].name == username){
+				console.log(true)
+				socket.emit('connectionResult', true)
+			}else{
+				console.log(false)
+				socket.emit('connectionResult', false)
+			}
+			}
+			 catch(e){}
+			}
+		
+		}
+		}
+	})
 	socket.on('get_username', function(username){
+		try{
 		username = filterHTML(username);
+		}catch(e){};
 		user = new User(username);
+		console.log(user.name + " is " + address)
 	})
 	socket.on('logon', function(username){
+		try{
 		username = filterHTML(username);
+		}catch(e){};
 		io.send('<br><b>' + username + '</b> has entered the chatroom.');
 		io.send('<br><b>Core Bot</b>> Hello, ' + username + "!")
 	})
 	socket.on('message', function(msg, username){
+		try{
 		msg = msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", "");
 		msg = filterHTML(msg);
 		username = filterHTML(username);
+		}catch(e){};
 		io.emit('message', "<br><b><span style='txt'>"+msg+"</b></span>", username);
-		//console.log(msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", ""))
+		try{
+		console.log(msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", ""))
+		}catch(e){};
 	});
 	socket.on('disconnect', function(){
-		io.send('<br><b>' + user.name + '</b> has left the chatroom.');
-		io.send('<br><b>Core Bot</b>> Bye, ' + user.name + "!")
+		try{
+			io.send('<br><b>' + user.name + '</b> has left the chatroom.');
+			io.send('<br><b>Core Bot</b>> Bye, ' + user.name + "!")
+		}catch(e){}
 		socket.emit('disconnect_', user)
 		users.splice(users.indexOf(user), 1)
-		//console.log(users)
-		//console.log('disconnect ' + address)
+		connectedips.splice(connectedips.indexOf(address), 1)
+		try{
+		console.log('disconnect ' + address + " (" + user.name + ")")
+		}catch(e){}
 	})
 	socket.on('connection', function(socket){
 		io.emit('connection', socket)
@@ -86,7 +136,51 @@ io.on('connection', function(socket){
 		}
 		socket.emit('receive_user_list', usernamelist.join());
 	})
+	socket.on('check', function(hash){
+		var pass = 0;
+		hashes = JSON.parse(fs.readFileSync('hashes.json'));
+		for(i of Object.keys(hashes)){
+			if(i == hash){
+				pass = 1
+			}
+		}
+		if(pass == 0){
+			socket.emit("checkF")
+		}else{
+			socket.emit("checkS")
+		}
+	})
+	socket.on('getUser', function(hash){
+		var pass = 0;
+		var h;
+		hashes = JSON.parse(fs.readFileSync('hashes.json'));
+		for(i of Object.keys(hashes)){
+			if(i == hash){
+				h = i
+				pass = 1
+			}
+		}
+		if(pass == 0){
+			socket.emit("receiveUser", false)
+		}else{
+			socket.emit("receiveUser", hashes[h])
+		}
+	})
+	socket.on('CheckUserExists', function(data){
+		hashes = JSON.parse(fs.readFileSync('hashes.json'));
+		for(i of Object.values(hashes)){
+			if(i == data[0]){
+				socket.emit('checkF')
+			}else{
+				hashes[sha256(data[0]+data[1])] = data[0]
+				fs.writeFileSync('hashes.json', JSON.stringify(hashes, null, "\t"));
+				socket.emit('checkS')
+			}
+		}
+			
+	})
 });
+
 
 http.listen(port, function(){
 	console.log('listening on *:' + port);

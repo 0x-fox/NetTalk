@@ -1,0 +1,309 @@
+<audio id="ping">
+	<source src="/assets/ping.mp3" type="audio/mpeg">
+</audio>
+<html>
+	<head>
+		<title>NetTalk</title>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+	</head>
+	<body id="bg">
+		<style>
+		
+		span.b {
+			text-shadow: 2px, 2px, black;
+			font-size: 20px;
+		}
+		
+		txt {
+			text-transform: capitalize;
+			letter-spacing: 2px;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+		#bg {
+			background-color: rgb(69,75,0);
+			background-image: linear-gradient(Fuchsia, CornflowerBlue);
+			margin: 2;
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+		}
+		body {
+			background-color: Gold;
+		} 
+		
+		
+		button {
+			background-image: linear-gradient(GoldenRod, Gold);
+			border: none;
+			color: white;
+			padding: 4px 30px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+		#btt {
+			background-image: linear-gradient(GoldenRod, Gold);
+			border: none;
+			color: white;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+		input {
+			width: 960px;
+			padding: 4px 2px;
+			display: inline-block;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+		span.credits {
+			font-size: 12px;
+			color: light_gray;
+		}
+		span.credits+ {
+			font-size: 20px;
+			color: black;
+		}
+		a.credits {
+			font-size: 14px;
+			color: light_gray;
+		}
+		</style>
+		<script type="text/javascript">
+			var pings;
+			let socket;
+			var userlist;
+			var username;
+			var users;
+			var go = 0;
+			canuse = true;
+			function getRandomInt(max) {
+				return Math.floor(Math.random() * Math.floor(max));
+			}
+			function getCookie(cname) {
+				var name = cname + "=";
+				var decodedCookie = decodeURIComponent(document.cookie);
+				var ca = decodedCookie.split(';');
+				for(var i = 0; i <ca.length; i++) {
+					var c = ca[i];
+					while (c.charAt(0) == ' ') {
+						c = c.substring(1);
+					}
+					if (c.indexOf(name) == 0) {
+						return c.substring(name.length, c.length);
+					}
+				}
+				return "";
+			}
+			function setCookie(cname, cvalue, exdays) {
+				var d = new Date();
+				d.setTime(d.getTime() + (exdays*24*60*60*1000));
+				var expires = "expires="+ d.toUTCString();
+				document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+			}
+
+			
+			$(document).ready(function(){
+			socket = io.connect('http://' + document.domain + ":" + location.port, {'sync disconnect on unload': true });
+			
+			socket.emit("getUser", getCookie("token"))
+			socket.on("receiveUser", function(u){
+				
+				if(u != false){
+					username = u
+					socket.emit("checkConnection", username);
+					console.log(username)
+					socket.on("connectionResult", function(r){
+						console.log(r)
+						if(r==true){
+							alert("Machine already running an instance / Account already logged on. Try logging in with another account.")
+							socket.disconnect()
+							window.open('log.html', '_self');
+							return;
+						}
+					})
+					socket.emit('get_username', username)
+					socket.emit('logon', username)
+					socket.on('connect', function(){
+						socket.emit('request_user_list', username)
+					})
+				} else {
+					alert("Session expired / token is incorrect. Please login again.")
+					setCookie("token", null, 0)
+					window.open('log.html', '_self');
+					socket.disconnect()
+				}
+			})
+			
+			
+			setInterval(function(){
+				socket.emit('request_user_list')
+			}, 250)
+			socket.on('receive_user_list', function(user_list){
+				unformatted_userlist = user_list.split(',')
+				userlist = []
+				for(i=0; i<unformatted_userlist.length; i++){
+					userlist.push("<br>" + unformatted_userlist[i])
+				}
+				document.getElementById('user_list').innerHTML = userlist.toString()
+				users = user_list.split(',')
+				if(users[0] != "Core Bot"){
+					users.unshift("Core Bot")
+				}
+			});
+			
+			
+			// stuff //
+			String.prototype.replaceAll = function(search, replacement) {
+			var target = this;
+			return target.replace(new RegExp(search, 'g'), replacement);
+			};
+
+			function replaceAll(str, map){
+				for(key in map){
+					str = str.replaceAll(key, map[key]);
+				}
+				return str;
+			}
+			// --- //
+            $('#send').on('click', function(){
+				msg = document.getElementById('user_message').value
+				emoji = {':grin:' : '😀', ':joy:' : '😂', ':smiley:' : '🙂', ':wink:' : '😉', ':sunglasses:' : '😎', ':neutral:' : '😑', ':sad:' : '🙁', ':angry:' : '😡', ':cry:' : '😥', ':shrug:' : '🤷', ':thinking:' : '🤔', ':100:' : '💯', ':fire:' : '🔥'}
+				if(!msg.startsWith(' ') && msg != ''){
+					msg_ = replaceAll(msg, emoji)
+					socket.emit('message', '<br><b><span style=\'txt\'>'+username+"</b>> "+msg_+'</span>', username);
+					document.getElementById("send_message").reset()
+				}
+			});
+			pings = 1
+            socket.on('message', function(fmsg, usern){
+			if (!document.onfocus){
+				if(usern!=username){
+					if(pings == 1){
+						document.getElementById("ping").play()
+					}
+				}
+			}
+			  document.getElementById('messages').innerHTML += fmsg;
+            });
+		
+			});
+			$(function() {
+				$('input, textarea, select').focus(function() {
+					selectedInput = this;
+				}).blur(function(){
+					selectedInput = null;
+				});
+			});
+		</script>
+		<div id="mscroll">
+		<span id="messages"></span>
+		</div>
+		<form autocomplete="off" id="send_message" action="javascript:void(0)">
+		<input id="user_message" list="emojis" name="inputBox">
+		<button id="send">Send</button>
+		<datalist id="emojis">
+		<option value=":grin:">
+		<option value=":joy:">
+		<option value=":smiley:">
+		<option value=":sunglasses:">
+		<option value=":neutral:">
+		<option value=":sad:">
+		<option value=":angry:">
+		<option value=":cry:">
+		<option value=":shrug:">
+		<option value=":thinking:">
+		<option value=":100:">
+		<option value=":fire:">
+		</datalist>
+		</form>
+		<button onclick="darkMode()" id="darkmode">Dark mode (OFF)</button>
+		<button onclick="mute()" id="mute">Pings (ON)</button><br>
+		<br>
+		<span class="credits">Made by Creepi and Ad2017 (ad2017gd)</span><br>
+		<a class="credits" href="https://github.com/RealCreepi/NetTalk">GitHub repo</a><br>
+		<span class="credits+">By using this service, you agree to the </span><a href="tos.html" class="credits">ToS</a><br>
+		<a href="javascript:logout()">Log out</a>
+		<div id="mscroll2">
+		<span>User list:</span>
+		<span id="user_list"></span>
+		</div>
+		<script>
+			function setCookie(cname, cvalue, exdays) {
+				var d = new Date();
+				d.setTime(d.getTime() + (exdays*24*60*60*1000));
+				var expires = "expires="+ d.toUTCString();
+				document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+			}
+			function logout(){
+				setCookie("token", "", 0)
+				window.open("log.html", "_self")
+			}
+			$("#mscroll").css("max-height", "65%");
+			$("#mscroll").css("overflow", "auto");
+			$("#mscroll").css("height", "65%");
+			
+			$("#mscroll2").css("max-height", 100);
+			$("#mscroll2").css("overflow", "auto");
+			$("#mscroll2").css("height", 100);
+			$("#mscroll2").css("text-align", "right");
+			
+			function mute(){
+				if(pings == 0){
+					pings = 1
+					document.getElementById('mute').innerHTML = "Pings (ON)"
+				} else {
+					pings = 0
+					document.getElementById('mute').innerHTML = "Pings (OFF)"
+				}
+			}
+			function darkMode(){
+				button = document.getElementById('darkmode')
+				if(button.innerHTML == "Dark mode (OFF)"){
+					$("#bg").css("background-image", "none");
+					$("#bg").css("background-color", "#202020");
+					$("button").css("background-image", "none");
+					$("button").css("background-color", "#000000");
+					$("input").css("background-color", "#484848");
+					$("span").css("color", "#FFFFFF");
+					button.innerHTML = "Dark mode (ON)";
+				} else {
+					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
+					$("#bg").css("background-color", "rgb(69,75,0)");
+					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
+					$("input").css("background-color", "#FFFFFF");
+					$("span").css("color", "#000000");
+					button.innerHTML = "Dark mode (OFF)";
+				}
+			}
+			
+			
+			window.setInterval(function() {
+				var elem = document.getElementById('mscroll');
+				elem.scrollTop = elem.scrollHeight;
+			}, 500);
+			var input = document.getElementById("user_message");
+			input.addEventListener("keyup", function(event) {
+				if (event.keyCode === 13) {
+					if($('#user_message').val() != "") {
+						document.getElementById("send").click();
+						document.getElementById("send_message").reset()
+					}
+				}
+			})
+		</script>
+	</body>
+</html>
+<audio id="ping">
+	<source src="/assets/ping.mp3" type="audio/mpeg">
+</audio>
