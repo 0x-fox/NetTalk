@@ -168,7 +168,9 @@ io.on('connection', function(socket){
 	})
 	socket.on('CheckUserExists', function(data){
 		hashes = JSON.parse(fs.readFileSync('hashes.json'));
+		u = 0
 		for(i of Object.values(hashes)){
+			u++
 			if(i == data[0]){
 				socket.emit('checkF')
 			}else{
@@ -176,6 +178,11 @@ io.on('connection', function(socket){
 				fs.writeFileSync('hashes.json', JSON.stringify(hashes, null, "\t"));
 				socket.emit('checkS')
 			}
+		}
+		if(u==0){
+			hashes[sha256(data[0]+data[1])] = data[0]
+			fs.writeFileSync('hashes.json', JSON.stringify(hashes, null, "\t"));
+			socket.emit('checkS')
 		}
 			
 	})
