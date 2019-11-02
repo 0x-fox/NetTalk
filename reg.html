@@ -74,6 +74,36 @@
 		<br><br><br><br><br>
 		<span class="credits+">By using this service, you agree to the </span><a href="tos.html" class="credits">ToS</a>
 		<script>
+		function getCookie(cname) {
+				var name = cname + "=";
+				var decodedCookie = decodeURIComponent(document.cookie);
+				var ca = decodedCookie.split(';');
+				for(var i = 0; i <ca.length; i++) {
+					var c = ca[i];
+					while (c.charAt(0) == ' ') {
+						c = c.substring(1);
+					}
+					if (c.indexOf(name) == 0) {
+						return c.substring(name.length, c.length);
+					}
+				}
+				return "";
+			}
+		if(getCookie("darkmode") == "true"){
+					$("#bg").css("background-image", "none");
+					$("#bg").css("background-color", "#202020");
+					$("button").css("background-image", "none");
+					$("button").css("background-color", "#000000");
+					$("input").css("background-color", "#484848");
+					$("span").css("color", "#FFFFFF");
+				} else {
+					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
+					$("#bg").css("background-color", "rgb(69,75,0)");
+					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
+					$("input").css("background-color", "#FFFFFF");
+					$("span").css("color", "#000000");
+			}
+			
 		socket = io.connect('http://' + document.domain + ":" + location.port);
 		function verify(){
 			if(document.getElementById("password").value != document.getElementById("cpassword").value){

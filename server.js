@@ -24,7 +24,6 @@ class User {
 }
 
 var filterHTML = function(s){return s.replace(/>/g,"&gt;").replace(/</g,"&lt;")};
-var Core_Bot = new User("Core Bot");
 
 app.use(express.static(path.join(__dirname, '/')));
 
@@ -39,7 +38,7 @@ app.get('/pages/process_get', function(req, res){
         reason : req.query.reason
     }
 	console.log(response)
-    res.end("Reported.");
+    res.send("Reported. <a href='javascript:window.history.back();'>Back</a>");
 });
 
 function randomstr(len) {
@@ -47,6 +46,7 @@ function randomstr(len) {
 }
 
 io.on('connection', function(socket){
+	
 	for(i=0;i<banned.length; i++){
 		if(banned[i].toString() == socket.handshake.address.replace('::ffff:', '')){
 			socket.emit('message', "You are banned from NetTalk. <br>", "Core Bot");
@@ -61,29 +61,17 @@ io.on('connection', function(socket){
 	socket.on('checkConnection', function(username){
 		m=0
 		for(i=0; i<connectedips.length; i++){
-		if(connectedips[i] == address){
-			m++
+			if(connectedips[i] == address){
+				m++
+			}
 		}
-		console.log(m)
-		console.log(connectedips)
+
 		if(m>1){
 			socket.emit('connectionResult', true)
 			console.log(true)
 		} else {
-			for(i=0; i<users.length; i++){
-			try{
-			if(users[1].name == username){
-				console.log(true)
-				socket.emit('connectionResult', true)
-			}else{
-				console.log(false)
-				socket.emit('connectionResult', false)
-			}
-			}
-			 catch(e){}
-			}
-		
-		}
+			console.log(false)
+			socket.emit('connectionResult', false)
 		}
 	})
 	socket.on('get_username', function(username){
@@ -97,37 +85,23 @@ io.on('connection', function(socket){
 		try{
 		username = filterHTML(username);
 		}catch(e){};
-		io.send('<br><b>' + username + '</b> has entered the chatroom.');
-		io.send('<br><b>Core Bot</b>> Hello, ' + username + "!")
 	})
-	socket.on('message', function(msg, username){
+	socket.on('message', function(msg){
 		try{
-		msg = msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", "");
 		msg = filterHTML(msg);
-		username = filterHTML(username);
 		}catch(e){};
-		io.emit('message', "<br><b><span style='txt'>"+msg+"</b></span>", username);
+		io.emit('message', "<br>"+user.name+"> <b><span style='txt'>"+msg+"</b></span>");
 		try{
 		console.log(msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", ""))
 		}catch(e){};
 	});
 	socket.on('disconnect', function(){
-		try{
-			io.send('<br><b>' + user.name + '</b> has left the chatroom.');
-			io.send('<br><b>Core Bot</b>> Bye, ' + user.name + "!")
-		}catch(e){}
 		socket.emit('disconnect_', user)
 		users.splice(users.indexOf(user), 1)
 		connectedips.splice(connectedips.indexOf(address), 1)
 		try{
 		console.log('disconnect ' + address + " (" + user.name + ")")
 		}catch(e){}
-	})
-	socket.on('connection', function(socket){
-		io.emit('connection', socket)
-	})
-	socket.on('reconnect', function(socket){
-		io.emit('connection', socket)
 	})
 	socket.on('request_user_list', function() {
 		usernamelist = [];
@@ -173,6 +147,7 @@ io.on('connection', function(socket){
 			u++
 			if(i == data[0]){
 				socket.emit('checkF')
+				break;
 			}else{
 				hashes[sha256(data[0]+data[1])] = data[0]
 				fs.writeFileSync('hashes.json', JSON.stringify(hashes, null, "\t"));

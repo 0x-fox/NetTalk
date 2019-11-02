@@ -1,10 +1,83 @@
 <html>
-<body style="
-background-image: linear-gradient(Fuchsia, CornflowerBlue);
-margin: 2;
-background-repeat: no-repeat;
-background-attachment: fixed;
-">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<style>
+		
+		span.b {
+			text-shadow: 2px, 2px, black;
+			font-size: 20px;
+		}
+		
+		txt {
+			text-transform: capitalize;
+			letter-spacing: 2px;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+		#bg {
+			color: black
+			background-color: rgb(69,75,0);
+			background-image: linear-gradient(Fuchsia, CornflowerBlue);
+			margin: 2;
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+		}
+		body {
+			background-color: Gold;
+		} 
+		
+		
+		button {
+			background-image: linear-gradient(GoldenRod, Gold);
+			border: none;
+			color: white;
+			padding: 4px 30px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+		#btt {
+			background-image: linear-gradient(GoldenRod, Gold);
+			border: none;
+			color: white;
+			padding: 4px 30px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+		input {
+			width: 175px;
+			padding: 4px 2px;
+			display: inline-block;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+		span.credits {
+			font-size: 12px;
+			color: light_gray;
+		}
+		span.credits+ {
+			font-size: 20px;
+			color: black;
+		}
+		a.credits {
+			font-size: 14px;
+			color: light_gray;
+		}
+		</style>
+
+<body id="bg">
+
 <h1>Privacy Policy and ToS</h1>
 By using this service, you allow us to collect: <br>
  - Your IP along with your username <br>
@@ -24,4 +97,37 @@ If someone is misbehaving, you can always <a href="/report.html">report them.</a
 <br><br><br>
 <a href="javascript:window.history.back();">Back</a>
 </body>
+<script>
+function getCookie(cname) {
+				var name = cname + "=";
+				var decodedCookie = decodeURIComponent(document.cookie);
+				var ca = decodedCookie.split(';');
+				for(var i = 0; i <ca.length; i++) {
+					var c = ca[i];
+					while (c.charAt(0) == ' ') {
+						c = c.substring(1);
+					}
+					if (c.indexOf(name) == 0) {
+						return c.substring(name.length, c.length);
+					}
+				}
+				return "";
+			}
+		if(getCookie("darkmode") == "true"){
+					$("#bg").css("background-image", "none");
+					$("#bg").css("color", "white");
+					$("#bg").css("background-color", "#202020");
+					$("button").css("background-image", "none");
+					$("button").css("background-color", "#000000");
+					$("input").css("background-color", "#484848");
+					$("span").css("color", "#FFFFFF");
+				} else {
+					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
+					$("#bg").css("color", "black");
+					$("#bg").css("background-color", "rgb(69,75,0)");
+					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
+					$("input").css("background-color", "#FFFFFF");
+					$("span").css("color", "#000000");
+			}
+</script>
 </html>

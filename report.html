@@ -1,4 +1,5 @@
 <html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <style>
 		
 		span.b {
@@ -80,8 +81,40 @@
             Reason: <input type="text" name="reason"> <br>
             <input type="submit" id="btt" value="Submit report">        
 </form>
-You can close the page that will open.
 <br><br><br>
 <a href="javascript:window.history.back();">Back</a>
 </body>
+<script>
+function getCookie(cname) {
+				var name = cname + "=";
+				var decodedCookie = decodeURIComponent(document.cookie);
+				var ca = decodedCookie.split(';');
+				for(var i = 0; i <ca.length; i++) {
+					var c = ca[i];
+					while (c.charAt(0) == ' ') {
+						c = c.substring(1);
+					}
+					if (c.indexOf(name) == 0) {
+						return c.substring(name.length, c.length);
+					}
+				}
+				return "";
+			}
+		if(getCookie("darkmode") == "true"){
+					$("#bg").css("background-image", "none");
+					$("#bg").css("color", "white");
+					$("#bg").css("background-color", "#202020");
+					$("button").css("background-image", "none");
+					$("button").css("background-color", "#000000");
+					$("input").css("background-color", "#484848");
+					$("span").css("color", "#FFFFFF");
+				} else {
+					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
+					$("#bg").css("color", "black");
+					$("#bg").css("background-color", "rgb(69,75,0)");
+					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
+					$("input").css("background-color", "#FFFFFF");
+					$("span").css("color", "#000000");
+			}
+</script>
 </html>

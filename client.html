@@ -111,9 +111,30 @@
 				var expires = "expires="+ d.toUTCString();
 				document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 			}
-
+			
+			
 			
 			$(document).ready(function(){
+			
+			if(getCookie("darkmode") == "true"){
+					button = document.getElementById('darkmode')
+					$("#bg").css("background-image", "none");
+					$("#bg").css("background-color", "#202020");
+					$("button").css("background-image", "none");
+					$("button").css("background-color", "#000000");
+					$("input").css("background-color", "#484848");
+					$("span").css("color", "#FFFFFF");
+					button.innerHTML = "Dark mode (ON)";
+				} else {
+					button = document.getElementById('darkmode')
+					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
+					$("#bg").css("background-color", "rgb(69,75,0)");
+					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
+					$("input").css("background-color", "#FFFFFF");
+					$("span").css("color", "#000000");
+					button.innerHTML = "Dark mode (OFF)";
+			}
+			
 			socket = io.connect('http://' + document.domain + ":" + location.port, {'sync disconnect on unload': true });
 			
 			socket.emit("getUser", getCookie("token"))
@@ -123,27 +144,34 @@
 					username = u
 					socket.emit("checkConnection", username);
 					console.log(username)
+					var res__;
 					socket.on("connectionResult", function(r){
+						res__ = r;
 						console.log(r)
 						if(r==true){
-							alert("Machine already running an instance / Account already logged on. Try logging in with another account.")
 							socket.disconnect()
-							window.open('log.html', '_self');
+							alert("Machine already running an instance / Account already logged on. Try logging in with another account.")
+							window.close();
+							document.getElementById('messages').innerHTML += "Disconnected.";
 							return;
 						}
+						socket.emit('get_username', username)
+						socket.emit('logon', username)
+						socket.on('connect', function(){
+							socket.emit('request_user_list', username)
+						
+						})
 					})
-					socket.emit('get_username', username)
-					socket.emit('logon', username)
-					socket.on('connect', function(){
-						socket.emit('request_user_list', username)
-					})
+					
+					
 				} else {
+					socket.disconnect()
 					alert("Session expired / token is incorrect. Please login again.")
 					setCookie("token", null, 0)
 					window.open('log.html', '_self');
-					socket.disconnect()
 				}
 			})
+			document.getElementById('messages').innerHTML += "<b>Welcome to NetTalk!</b>";
 			
 			
 			setInterval(function(){
@@ -181,7 +209,7 @@
 				emoji = {':grin:' : '😀', ':joy:' : '😂', ':smiley:' : '🙂', ':wink:' : '😉', ':sunglasses:' : '😎', ':neutral:' : '😑', ':sad:' : '🙁', ':angry:' : '😡', ':cry:' : '😥', ':shrug:' : '🤷', ':thinking:' : '🤔', ':100:' : '💯', ':fire:' : '🔥'}
 				if(!msg.startsWith(' ') && msg != ''){
 					msg_ = replaceAll(msg, emoji)
-					socket.emit('message', '<br><b><span style=\'txt\'>'+username+"</b>> "+msg_+'</span>', username);
+					socket.emit('message', msg_);
 					document.getElementById("send_message").reset()
 				}
 			});
@@ -270,6 +298,7 @@
 			function darkMode(){
 				button = document.getElementById('darkmode')
 				if(button.innerHTML == "Dark mode (OFF)"){
+					setCookie("darkmode", true, 35565)
 					$("#bg").css("background-image", "none");
 					$("#bg").css("background-color", "#202020");
 					$("button").css("background-image", "none");
@@ -278,6 +307,7 @@
 					$("span").css("color", "#FFFFFF");
 					button.innerHTML = "Dark mode (ON)";
 				} else {
+					setCookie("darkmode", false, 35565)
 					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
 					$("#bg").css("background-color", "rgb(69,75,0)");
 					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
