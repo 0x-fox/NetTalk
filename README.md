@@ -3,5 +3,6 @@ NetTalk is a chatting project started by me and Ad2017 (github - ad2017gd)
 We want to make a web-chatting app for users to talk with friends or other people.
 
 # Testing
-If you would like to test NetTalk until the Public Release, please join our discord server! 
-http://discord.gg/E5VkHVs
+- Download the repository using your preffered method.
+- Install node.js and the following requirements : express, js-sha256, http, socket.io, path, fs (using npm: `npm install express js-sha256 http socket.io path fs`)
+- Run `open.bat` or open a terminal in your repository folder and run `node server`
