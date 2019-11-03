@@ -62,6 +62,7 @@
 			$(document).ready(function(){
 			
 			if(getCookie("darkmode") == "true"){
+					button = document.getElementById('darkmode')
 					$("#bg-client").css("background-image", "none");
 					$("#bg-client").css("background-color", "#202020");
 					$("button").css("background-image", "none");
@@ -75,6 +76,7 @@
 					$("h4").css("color","#FFFFFF")
 					button.innerHTML = "Dark mode (ON)";
 				} else {
+					button = document.getElementById('darkmode')
 					$("#bg-client").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
 					$("#bg-client").css("background-color", "rgb(69,75,0)");
 					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
