@@ -11,13 +11,10 @@ var banned = []
 var connectedips = []
 var sessions = {}
 
-function lrem(arr, value) {
-
-   return arr.filter(function(ele){
-       return ele != value;
-   });
-
+if(!fs.existsSync("hashes.json")){
+	fs.writeFileSync("hashes.json", "{}")
 }
+
 
 class User {
 	constructor(name) {
