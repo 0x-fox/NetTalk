@@ -47,12 +47,13 @@ text {
 }
 
 .message {
-	width: 50%;
-	margin-left: 25%;
-	height: 2.5%;
+	width: 80%;
+	margin-left: 10%;
+	height: 3.5%;
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
+	overflow: hidden;
 }
 
 body {
