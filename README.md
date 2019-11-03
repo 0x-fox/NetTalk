@@ -1,5 +1,5 @@
 # What is NetTalk?
-NetTalk is a chatting project created by me and Ad2017 (github - ad2017gd).
+NetTalk is a chatting project created by me and Ad2017 (github - ad2017gd)
 We want to create a public web-chatting app for users to talk with friends, other people or just have fun.
 
 # Testing

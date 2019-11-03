@@ -6,58 +6,8 @@
 		<title>NetTalk</title>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-	</head>
-	<body id="bg">
+		<link href="css/style.css" rel="stylesheet">
 		<style>
-		
-		span.b {
-			text-shadow: 2px, 2px, black;
-			font-size: 20px;
-		}
-		
-		txt {
-			text-transform: capitalize;
-			letter-spacing: 2px;
-			font-family: Arial, Helvetica, sans-serif;
-		}
-		#bg {
-			background-color: rgb(69,75,0);
-			background-image: linear-gradient(Fuchsia, CornflowerBlue);
-			margin: 2;
-			background-repeat: no-repeat;
-			background-attachment: fixed;
-		}
-		body {
-			background-color: Gold;
-		} 
-		
-		
-		button {
-			background-image: linear-gradient(GoldenRod, Gold);
-			border: none;
-			color: white;
-			padding: 4px 30px;
-			text-align: center;
-			text-decoration: none;
-			display: inline-block;
-			font-size: 16px;
-			margin: 4px 2px;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			box-sizing: border-box;
-		}
-		#btt {
-			background-image: linear-gradient(GoldenRod, Gold);
-			border: none;
-			color: white;
-			text-align: center;
-			text-decoration: none;
-			display: inline-block;
-			font-size: 16px;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			box-sizing: border-box;
-		}
 		input {
 			width: 960px;
 			padding: 4px 2px;
@@ -66,19 +16,16 @@
 			border-radius: 4px;
 			box-sizing: border-box;
 		}
-		span.credits {
-			font-size: 12px;
-			color: light_gray;
-		}
-		span.credits+ {
-			font-size: 20px;
-			color: black;
-		}
-		a.credits {
-			font-size: 14px;
-			color: light_gray;
-		}
 		</style>
+	</head>
+	<header>
+		<div class="inner_header">
+			<div class="logo_container">
+				<h1>NetTalk</h1>
+			</div>
+		</div>
+	</header>
+	<body id="bg-client">
 		<script type="text/javascript">
 			var pings;
 			let socket;
@@ -112,67 +59,57 @@
 				document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 			}
 			
-			
-			
 			$(document).ready(function(){
 			
 			if(getCookie("darkmode") == "true"){
-					button = document.getElementById('darkmode')
-					$("#bg").css("background-image", "none");
-					$("#bg").css("background-color", "#202020");
+					$("#bg-client").css("background-image", "none");
+					$("#bg-client").css("background-color", "#202020");
 					$("button").css("background-image", "none");
 					$("button").css("background-color", "#000000");
 					$("input").css("background-color", "#484848");
+					$("input").css("color", "#FFFFFF");
 					$("span").css("color", "#FFFFFF");
+					$("h1").css("color","#FFFFFF")
+					$("h2").css("color","#FFFFFF")
+					$("h3").css("color","#FFFFFF")
+					$("h4").css("color","#FFFFFF")
 					button.innerHTML = "Dark mode (ON)";
 				} else {
-					button = document.getElementById('darkmode')
-					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
-					$("#bg").css("background-color", "rgb(69,75,0)");
+					$("#bg-client").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
+					$("#bg-client").css("background-color", "rgb(69,75,0)");
 					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
 					$("input").css("background-color", "#FFFFFF");
+					$("input").css("color", "#000000");
 					$("span").css("color", "#000000");
+					$("h1").css("color","#000000")
+					$("h2").css("color","#000000")
+					$("h3").css("color","#000000")
+					$("h4").css("color","#000000")
 					button.innerHTML = "Dark mode (OFF)";
 			}
 			
 			socket = io.connect('http://' + document.domain + ":" + location.port, {'sync disconnect on unload': true });
 			
-			socket.emit("getUser", getCookie("token"))
-			socket.on("receiveUser", function(u){
-				
-				if(u != false){
-					username = u
-					socket.emit("checkConnection", username);
-					console.log(username)
-					var res__;
-					socket.on("connectionResult", function(r){
-						res__ = r;
-						console.log(r)
-						if(r==true){
+			socket.emit("checkSession")
+			socket.on("checkF", function() {
+				socket.disconnect()
+				window.open('log.html', '_self');
+			})
+			socket.on("checkS", function() {
+				socket.emit("logon")
+				socket.on("give_username",function(username) {
+					socket.emit("checkConnection")
+					socket.on("connectionResult",function(a){
+						if (a) {
 							socket.disconnect()
 							alert("Machine already running an instance / Account already logged on. Try logging in with another account.")
-							window.close();
 							document.getElementById('messages').innerHTML += "Disconnected.";
 							return;
 						}
-						socket.emit('get_username', username)
-						socket.emit('logon', username)
-						socket.on('connect', function(){
-							socket.emit('request_user_list', username)
-						
-						})
 					})
-					
-					
-				} else {
-					socket.disconnect()
-					alert("Session expired / token is incorrect. Please login again.")
-					setCookie("token", null, 0)
-					window.open('log.html', '_self');
-				}
+					socket.emit('request_user_list', username)
+				})
 			})
-			document.getElementById('messages').innerHTML += "<b>Welcome to NetTalk!</b>";
-			
 			
 			setInterval(function(){
 				socket.emit('request_user_list')
@@ -274,7 +211,7 @@
 				document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 			}
 			function logout(){
-				setCookie("token", "", 0)
+				socket.emit("destroySession")
 				window.open("log.html", "_self")
 			}
 			$("#mscroll").css("max-height", "65%");
@@ -299,20 +236,30 @@
 				button = document.getElementById('darkmode')
 				if(button.innerHTML == "Dark mode (OFF)"){
 					setCookie("darkmode", true, 35565)
-					$("#bg").css("background-image", "none");
-					$("#bg").css("background-color", "#202020");
+					$("#bg-client").css("background-image", "none");
+					$("#bg-client").css("background-color", "#202020");
 					$("button").css("background-image", "none");
 					$("button").css("background-color", "#000000");
 					$("input").css("background-color", "#484848");
+					$("input").css("color", "#FFFFFF");
 					$("span").css("color", "#FFFFFF");
+					$("h1").css("color","#FFFFFF")
+					$("h2").css("color","#FFFFFF")
+					$("h3").css("color","#FFFFFF")
+					$("h4").css("color","#FFFFFF")
 					button.innerHTML = "Dark mode (ON)";
 				} else {
 					setCookie("darkmode", false, 35565)
-					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
-					$("#bg").css("background-color", "rgb(69,75,0)");
+					$("#bg-client").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
+					$("#bg-client").css("background-color", "rgb(69,75,0)");
 					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
 					$("input").css("background-color", "#FFFFFF");
+					$("input").css("color", "#000000");
 					$("span").css("color", "#000000");
+					$("h1").css("color","#000000")
+					$("h2").css("color","#000000")
+					$("h3").css("color","#000000")
+					$("h4").css("color","#000000")
 					button.innerHTML = "Dark mode (OFF)";
 				}
 			}

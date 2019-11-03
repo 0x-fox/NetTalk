@@ -6,9 +6,11 @@ var io = require('socket.io')(http);
 var path = require('path')
 var port = process.env.PORT || 5000;
 var users = []
-const fs = require('fs');
+const fs = require('fs'); 
 var banned = []
 var connectedips = []
+var sessions = {}
+
 function lrem(arr, value) {
 
    return arr.filter(function(ele){
@@ -16,6 +18,7 @@ function lrem(arr, value) {
    });
 
 }
+
 class User {
 	constructor(name) {
 		this.name = name;
@@ -38,7 +41,7 @@ app.get('/pages/process_get', function(req, res){
         reason : req.query.reason
     }
 	console.log(response)
-    res.send("Reported. <a href='javascript:window.history.back();'>Back</a>");
+    res.send('<script>window.open("/log.html", "_self")</script>');
 });
 
 function randomstr(len) {
@@ -58,7 +61,7 @@ io.on('connection', function(socket){
 	var user;
 	var address = socket.handshake.address.replace('::ffff:', '').replace('::', '')
 	connectedips.push(address)
-	socket.on('checkConnection', function(username){
+	socket.on('checkConnection', function(){
 		m=0
 		for(i=0; i<connectedips.length; i++){
 			if(connectedips[i] == address){
@@ -68,31 +71,24 @@ io.on('connection', function(socket){
 
 		if(m>1){
 			socket.emit('connectionResult', true)
-			console.log(true)
 		} else {
-			console.log(false)
 			socket.emit('connectionResult', false)
 		}
 	})
-	socket.on('get_username', function(username){
+	socket.on('logon', function(){
 		try{
+		username = hashes[sessions[address][0]]
 		username = filterHTML(username);
 		}catch(e){};
 		user = new User(username);
-		console.log(user.name + " is " + address)
-	})
-	socket.on('logon', function(username){
-		try{
-		username = filterHTML(username);
-		}catch(e){};
+		socket.emit("give_username",username)
 	})
 	socket.on('message', function(msg){
 		try{
 		msg = filterHTML(msg);
 		}catch(e){};
-		io.emit('message', "<br>"+user.name+"> <b><span style='txt'>"+msg+"</b></span>");
+		io.emit('message', "<div class='message'>"+username+"> <span style='txt'><b>"+msg+"</b></span></div>");
 		try{
-		console.log(msg.replace("<br>", "").replace("<b>", "").replace("<span style='txt'>", "").replace("</b>", "").replace("</span>", "").replace("<br>", ""))
 		}catch(e){};
 	});
 	socket.on('disconnect', function(){
@@ -100,7 +96,6 @@ io.on('connection', function(socket){
 		users.splice(users.indexOf(user), 1)
 		connectedips.splice(connectedips.indexOf(address), 1)
 		try{
-		console.log('disconnect ' + address + " (" + user.name + ")")
 		}catch(e){}
 	})
 	socket.on('request_user_list', function() {
@@ -115,12 +110,36 @@ io.on('connection', function(socket){
 		hashes = JSON.parse(fs.readFileSync('hashes.json'));
 		for(i of Object.keys(hashes)){
 			if(i == hash){
+				sessions[address] = [i,"used_later"]
+				console.log(sessions)
 				pass = 1
 			}
 		}
 		if(pass == 0){
 			socket.emit("checkF")
 		}else{
+			socket.emit("checkS")
+		}
+	})
+	socket.on('destroySession',function() {
+		for (i of Object.keys(sessions)) {
+			if (i == address) {
+				delete sessions[address]
+				return;
+			}
+		}
+	})
+	socket.on('checkSession',function(){
+		var pass = 0;
+		for (i of Object.keys(sessions)) {
+			if (i == address) {
+				pass = 1
+			}
+		}
+		
+		if (pass == 0) {
+			socket.emit("checkF")
+		} else {
 			socket.emit("checkS")
 		}
 	})

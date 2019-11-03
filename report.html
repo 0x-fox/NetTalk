@@ -1,88 +1,25 @@
 <html>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-<style>
-		
-		span.b {
-			text-shadow: 2px, 2px, black;
-			font-size: 20px;
-		}
-		
-		txt {
-			text-transform: capitalize;
-			letter-spacing: 2px;
-			font-family: Arial, Helvetica, sans-serif;
-		}
-		#bg {
-			background-color: rgb(69,75,0);
-			background-image: linear-gradient(Fuchsia, CornflowerBlue);
-			margin: 2;
-			background-repeat: no-repeat;
-			background-attachment: fixed;
-		}
-		body {
-			background-color: Gold;
-		} 
-		
-		
-		button {
-			background-image: linear-gradient(GoldenRod, Gold);
-			border: none;
-			color: white;
-			padding: 4px 30px;
-			text-align: center;
-			text-decoration: none;
-			display: inline-block;
-			font-size: 16px;
-			margin: 4px 2px;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			box-sizing: border-box;
-		}
-		#btt {
-			background-image: linear-gradient(GoldenRod, Gold);
-			border: none;
-			color: white;
-			padding: 4px 30px;
-			text-align: center;
-			text-decoration: none;
-			display: inline-block;
-			font-size: 16px;
-			margin: 4px 2px;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			box-sizing: border-box;
-		}
-		input {
-			width: 175px;
-			padding: 4px 2px;
-			display: inline-block;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			box-sizing: border-box;
-		}
-		span.credits {
-			font-size: 12px;
-			color: light_gray;
-		}
-		span.credits+ {
-			font-size: 20px;
-			color: black;
-		}
-		a.credits {
-			font-size: 14px;
-			color: light_gray;
-		}
-		</style>
+<link href="css/style.css" rel="stylesheet">
 <body id="bg">
-<h1>Report tool</h1><br>
-<form onsubmit="javascript:void(1)" action="/pages/process_get" method="GET">
-            Your Username: <input type="text" name="author"> <br>
-	    Reported person's username: <input type="text" name="user"> <br>
-            Reason: <input type="text" name="reason"> <br>
-            <input type="submit" id="btt" value="Submit report">        
-</form>
-<br><br><br>
-<a href="javascript:window.history.back();">Back</a>
+	<header>
+		<div class="inner_header">
+			<div class="logo_container">
+				<h1>NetTalk</h1>
+			</div>
+		</div>
+	</header>
+	<div class="login">
+		<h1>Report tool</h1><br>
+		<form onsubmit="javascript:void(1)" action="/pages/process_get" method="GET">
+					<span>Your Username:</span> <input type="text" name="author"> <br>
+				<span>Reported person's username:</span> <input type="text" name="user"> <br>
+					<span>Reason:</span> <input type="text" name="reason"> <br>
+					<input type="submit" id="btt" value="Submit report">        
+		</form>
+		<br><br>
+		<a href="javascript:window.history.back();">Back</a>
+	</div>
 </body>
 <script>
 function getCookie(cname) {
@@ -100,21 +37,29 @@ function getCookie(cname) {
 				}
 				return "";
 			}
-		if(getCookie("darkmode") == "true"){
+			if(getCookie("darkmode") == "true"){
 					$("#bg").css("background-image", "none");
-					$("#bg").css("color", "white");
 					$("#bg").css("background-color", "#202020");
 					$("button").css("background-image", "none");
 					$("button").css("background-color", "#000000");
 					$("input").css("background-color", "#484848");
+					$("input").css("color", "#FFFFFF");
 					$("span").css("color", "#FFFFFF");
+					$("h1").css("color","#FFFFFF")
+					$("h2").css("color","#FFFFFF")
+					$("h3").css("color","#FFFFFF")
+					$("h4").css("color","#FFFFFF")
 				} else {
 					$("#bg").css("background-image", "linear-gradient(Fuchsia, CornflowerBlue)");
-					$("#bg").css("color", "black");
 					$("#bg").css("background-color", "rgb(69,75,0)");
 					$("button").css("background-image", "linear-gradient(GoldenRod, Gold)");
 					$("input").css("background-color", "#FFFFFF");
+					$("input").css("color", "#000000");
 					$("span").css("color", "#000000");
+					$("h1").css("color","#000000")
+					$("h2").css("color","#000000")
+					$("h3").css("color","#000000")
+					$("h4").css("color","#000000")
 			}
 </script>
 </html>
