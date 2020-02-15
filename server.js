@@ -100,6 +100,8 @@ function login(sock, pass) {
     console.log(pass)
     
     for (c_pass of Object.keys(hashes)) {
+        console.log(pass)
+        
         if (pass == c_pass) {
             failed = false
             var name = hashes[c_pass]
