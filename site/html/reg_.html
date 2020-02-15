@@ -74,7 +74,7 @@
 				document.getElementById("cpassword").value = ""
 				return;
 			}
-			socket.emit("register", document.getElementById("username").value, SHA256(document.getElementById("username").value, document.getElementById("password").value))
+			socket.emit("register", document.getElementById("username").value, SHA256(document.getElementById("username").value + document.getElementById("password").value))
 			socket.on('registerFail', function(){
 				alert("Username taken.")
 				document.getElementById("username").value = ""

@@ -88,9 +88,9 @@ function getSession(ip) {
     return user.getsession()
 }
 
-app.use( express.static( path.join( __dirname, '/' ) ) )
+app.use('/', express.static( __dirname + "/site" ) )
 app.get('/', function(req, res){
-    res.sendFile(__dirname + '/site/html/log.html')
+    res.sendFile(__dirname + '/site/html/index.html')
 })
 
 function login(sock, pass) {
@@ -101,7 +101,7 @@ function login(sock, pass) {
     
     for (c_pass of Object.keys(hashes)) {
         console.log(pass)
-        
+
         if (pass == c_pass) {
             failed = false
             var name = hashes[c_pass]
@@ -128,7 +128,7 @@ function register(sock, username, pass) {
     var hashes = getHashes();
 
     for (c_pass of Object.keys(hashes)) {
-        if (c_pass == pass) {
+        if ((c_pass == pass) || (hashes[c_pass] == username)) {
             failed = true
             break
         }
