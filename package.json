@@ -2,7 +2,8 @@
   {
     "name": "nettalk",
     "description": "-",
-    "version": "-",
+    "version": "1.0.0",
+    "engines": {}
   },
   "scripts": {
     "start": "node server.js"
