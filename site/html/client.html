@@ -90,7 +90,7 @@
 					button.innerHTML = "Dark mode (OFF)";
 			}
 			
-			socket = io.connect('http://' + document.domain + ":" + location.port, {'sync disconnect on unload': true });
+			socket = io.connect('https://' + document.domain + ":" + location.port, {'sync disconnect on unload': true });
 			
 			socket.emit("checkSession")
 			socket.on("checkFail", function() {

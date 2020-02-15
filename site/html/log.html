@@ -63,7 +63,7 @@
 					$("h3").css("color","#000000")
 					$("h4").css("color","#000000")
 			}
-			socket = io.connect('http://' + document.domain + ":" + location.port);
+			socket = io.connect('https://' + document.domain + ":" + location.port);
 			socket.emit("checkSession")
 			socket.on("checkSuccess", function(){
 				window.location.replace("/site/html/client.html")
