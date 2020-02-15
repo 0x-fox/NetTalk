@@ -1,186 +1,196 @@
-var express = require('express');
-var sha256 = require('js-sha256');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var express = require('express')
+var sha256 = require('js-sha256')
+var app = express()
+var http = require('http').Server(app)
+var io = require('socket.io')(http)
 var path = require('path')
-var port = process.env.PORT || 5000;
-var users = []
-const fs = require('fs'); 
-var banned = []
-var connectedips = []
-var sessions = {}
+var fs = require('fs')
+var port = process.env.PORT || 5000
+
+var filterHTML = function(string){
+    return string.replace(/>/g,"&gt;").replace(/</g,"&lt;").replace("javascript:","javascript˸") // preventing xss (ofc not perfect)
+}
+var usersonline = []
 
 if(!fs.existsSync("hashes.json")){
-        fs.writeFileSync("hashes.json", "{}")
+    fs.writeFileSync("hashes.json", "{}")
+}
+function getHashes() {
+    return JSON.parse(fs.readFileSync('hashes.json'))
+}
+function saveHashes(hashes) {
+    fs.writeFileSync('hashes.json', JSON.stringify(hashes, null, "\t"));
 }
 
+if(!fs.existsSync("banned.json")){
+    fs.writeFileSync("banned.json", "{}")
+}
+function getBanned() {
+    return JSON.parse(fs.readFileSync('banned.json'))
+}
+function saveBanned(banlist) {
+    fs.writeFileSync('banned.json', JSON.stringify(banned, null, "\t"));
+}
+
+function getIP(socket) {
+    return socket.handshake.address.replace("::","").replace("ffff:","")
+}
 
 class User {
-        constructor(name) {
-                this.name = name;
-                users.push(this);
-        }
-}
+    constructor(name, ip, session) {
+            this.name = name
+            this.ip = ip
+            this.session = session
 
-var filterHTML = function(s){return s.replace(/>/g,"&gt;").replace(/</g,"&lt;")};
-
-app.use(express.static(path.join(__dirname, '/')));
-
-app.get('/', function(req, res){
-        res.sendFile(__dirname + '/log.html');
-});
-
-app.get('/pages/process_get', function(req, res){
-    response = {
-                author : req.query.author,
-                username : req.query.user,
-        reason : req.query.reason
+            usersonline.push(this)
     }
-        console.log(response)
-    res.send('<script>window.open("/log.html", "_self")</script>');
-});
 
-function randomstr(len) {
-        return Math.random().toString(36).substring(len)
+    getname() {
+        return this.name
+    }
+
+    getip() {
+        return this.ip
+    }
+
+    getsession() {
+        return this.session
+    }
+
+    disconnect() {
+        var userindex = usersonline.indexOf(this)
+        usersonline.splice(userindex, 1)
+    }
 }
 
-io.on('connection', function(socket){
-
-        for(i=0;i<banned.length; i++){
-                if(banned[i].toString() == socket.handshake.address.replace('::ffff:', '')){
-                        socket.emit('message', "You are banned from NetTalk. <br>", "Core Bot");
-                        socket.emit('message', "If you think this is a mistake, appeal on our <a href=\"http://discord.gg/EGXMExr\">discord server</a>.", "Core Bot");
-                        socket.disconnect()
-                        return 0;
-                }
+function getUserByName(name) {
+    for (user of usersonline) {
+        if (user.getname() == name) {
+            return user
         }
-        var user;
-        var address = socket.handshake.address.replace('::ffff:', '').replace('::', '')
-        connectedips.push(address)
-        socket.on('checkConnection', function(){
-                m=0
-                for(i=0; i<connectedips.length; i++){
-                        if(connectedips[i] == address){
-                                m++
-                        }
-                }
+    }
+    return 0
+}
 
-                if(m>1){
-                        socket.emit('connectionResult', true)
-                } else {
-                        socket.emit('connectionResult', false)
-                }
-        })
-        socket.on('logon', function(){
-                try{
-                username = hashes[sessions[address][0]]
-                username = filterHTML(username);
-                }catch(e){};
-                user = new User(username);
-                socket.emit("give_username",username)
-        })
-        socket.on('message', function(msg){
-                hashes = JSON.parse(fs.readFileSync('hashes.json'));
-                try{
-                msg = filterHTML(msg);
-                }catch(e){};
-                io.emit('message', "<div class='message'>"+hashes[sessions[socket.handshake.address.replace('::ffff:', '').replace('::', '')][0]]+"> <span style='txt'><b>"+msg+"</b></span></div>");
-                try{
-                }catch(e){};
-        });
-        socket.on('disconnect', function(){
-                socket.emit('disconnect_', user)
-                users.splice(users.indexOf(user), 1)
-                connectedips.splice(connectedips.indexOf(address), 1)
-                try{
-                }catch(e){}
-        })
-        socket.on('request_user_list', function() {
-                usernamelist = [];
-                for (let i = 0; i < users.length; i++) {
-                        usernamelist.push(users[i].name)
-                }
-                socket.emit('receive_user_list', usernamelist.join());
-        })
-        socket.on('check', function(hash){
-                var pass = 0;
-                hashes = JSON.parse(fs.readFileSync('hashes.json'));
-                for(i of Object.keys(hashes)){
-                        if(i == hash){
-                                sessions[address] = [i,"used_later"]
-                                console.log(sessions)
-                                pass = 1
-                        }
-                }
-                if(pass == 0){
-                        socket.emit("checkF")
-                }else{
-                        socket.emit("checkS")
-                }
-        })
-        socket.on('destroySession',function() {
-                for (i of Object.keys(sessions)) {
-                        if (i == address) {
-                                delete sessions[address]
-                                return;
-                        }
-                }
-        })
-        socket.on('checkSession',function(){
-                var pass = 0;
-                for (i of Object.keys(sessions)) {
-                        if (i == address) {
-                                pass = 1
-                        }
-                }
+function getUserByIP(ip) {
+    for (user of usersonline) {
+        if (user.getip() == ip) {
+            return user
+        }
+    }
+    return 0
+}
 
-                if (pass == 0) {
-                        socket.emit("checkF")
-                } else {
-                        socket.emit("checkS")
-                }
-        })
-        socket.on('getUser', function(hash){
-                var pass = 0;
-                var h;
-                hashes = JSON.parse(fs.readFileSync('hashes.json'));
-                for(i of Object.keys(hashes)){
-                        if(i == hash){
-                                h = i
-                                pass = 1
-                        }
-                }
-                if(pass == 0){
-                        socket.emit("receiveUser", false)
-                }else{
-                        socket.emit("receiveUser", hashes[h])
-                }
-        })
-        socket.on('CheckUserExists', function(data){
-                hashes = JSON.parse(fs.readFileSync('hashes.json'));
-                u = 0
-                for(i of Object.values(hashes)){
-                        u++
-                        if(i == data[0]){
-                                socket.emit('checkF')
-                                break;
-                        }else{
-                                hashes[sha256(data[0]+data[1])] = data[0]
-                                fs.writeFileSync('hashes.json', JSON.stringify(hashes, null, "\t"));
-                                socket.emit('checkS')
-                        }
-                }
-                if(u==0){
-                        hashes[sha256(data[0]+data[1])] = data[0]
-                        fs.writeFileSync('hashes.json', JSON.stringify(hashes, null, "\t"));
-                        socket.emit('checkS')
-                }
+function getSession(ip) {
+    var user = getUserByIP(ip)
+    if (user == 0)
+        return 0
+    return user.getsession()
+}
 
-        })
-});
+app.use( express.static( path.join( __dirname, '/' ) ) )
+app.get('/', function(req, res){
+    res.sendFile(__dirname + '/site/html/log.html')
+})
 
+function login(sock, pass) {
+    var failed = true
+    var hashes = getHashes();
+
+    console.log(pass)
+    
+    for (c_pass of Object.keys(hashes)) {
+        if (pass == c_pass) {
+            failed = false
+            var name = hashes[c_pass]
+            var name = filterHTML(name)
+            var ip = getIP(sock)
+            var session = {ip, c_pass}
+            new User(name, ip, session)
+            break
+        }
+    }
+
+    if (failed)
+        sock.emit("loginFail")
+    else
+        sock.emit("loginSuccess")
+}
+
+function register(sock, username, pass) {
+    var user = getUserByIP(getIP(sock))
+    if (user != 0) 
+        return
+
+    var failed = false
+    var hashes = getHashes();
+
+    for (c_pass of Object.keys(hashes)) {
+        if (c_pass == pass) {
+            failed = true
+            break
+        }
+    }
+    
+    if (failed)
+        sock.emit("registerFail")
+    else {
+        hashes[pass] = username
+        saveHashes(hashes)
+
+        sock.emit("registerSuccess")
+    }
+}
+
+function UserDisconnect(sock) {
+    var user = getUserByIP(getIP(sock))
+    if (user == 0)
+        return
+    user.disconnect()
+}
+
+function sendMessage(sock, message) {
+    var user = getUserByIP(getIP(sock))
+    if (user == 0)
+        return
+    
+    var message = filterHTML(message)
+    var sendedMessage = "<div class='message'>"+user.name+"> <span style='txt'><b>"+message+"</b></span></div>"
+
+    sock.emit("message", sendedMessage)
+}
+
+function checkSession(sock) {
+    var session = getSession(getIP(sock))
+    if (session != 0)
+        sock.emit('checkSuccess')
+    else
+        sock.emit('checkFail')
+}
+
+function eventConnect(sock) {
+    var ip = getIP(sock)
+    var banlist = getBanned()
+    for(i of Object.keys(banlist)){
+        i = i.toString()
+        if(banlist[i].toString() == ip){
+            sock.emit('message', "This ip / account has been banned from using our services", "NetTalk")
+            sock.emit('message', "Of course, this could be a mistake. If you think so contact @_creepi on Twitter", "NetTalk")
+            UserDisconnect(sock)
+            sock.disconnect()
+            return
+        }
+    }
+
+    sock.on('login', function(pass){login(sock, pass)})
+    sock.on('destroySession', function(){UserDisconnect(sock)})
+    sock.on('register', function(username, pass){register(sock, username, pass)})
+    sock.on('message', function(message){sendMessage(sock, message)})
+    sock.on('checkSession', function(){checkSession(sock)})
+}
+
+io.on('connection',eventConnect)
 
 http.listen(port, function(){
-        console.log('listening on *:' + port);
-});
+    console.log('listening on *:' + port);
+})

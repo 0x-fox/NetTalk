@@ -6,7 +6,7 @@
 		<title>NetTalk</title>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-		<link href="css/style.css" rel="stylesheet">
+		<link href="/site/css/style.css" rel="stylesheet">
 		<style>
 		input {
 			width: 960px;
@@ -93,24 +93,11 @@
 			socket = io.connect('http://' + document.domain + ":" + location.port, {'sync disconnect on unload': true });
 			
 			socket.emit("checkSession")
-			socket.on("checkF", function() {
+			socket.on("checkFail", function() {
 				socket.disconnect()
-				window.open('log.html', '_self');
+				window.open('/site/html/log.html', '_self');
 			})
-			socket.on("checkS", function() {
-				socket.emit("logon")
-				socket.on("give_username",function(username) {
-					socket.emit("checkConnection")
-					socket.on("connectionResult",function(a){
-						if (a) {
-							socket.disconnect()
-							alert("Machine already running an instance / Account already logged on. Try logging in with another account.")
-							document.getElementById('messages').innerHTML += "Disconnected.";
-							return;
-						}
-					})
-					socket.emit('request_user_list', username)
-				})
+			socket.on("checkSuccess", function() {
 			})
 			
 			setInterval(function(){
@@ -284,5 +271,5 @@
 	</body>
 </html>
 <audio id="ping">
-	<source src="/assets/ping.mp3" type="audio/mpeg">
+	<source src="/site/assets/ping.mp3" type="audio/mpeg">
 </audio>
