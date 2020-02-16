@@ -6,7 +6,9 @@
     <link rel="stylesheet" type="text/css" href="/css/default.css">
     <script src="/js/default.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script>sock = io.connect('http://' + document.domain + ":" + location.port)</script>
+    <script>redirectifSession(sock, "/html/chat.html"); setInterval(function() {redirectifSession(sock, "/")}, 1000)</script>
 
     <title>NetTalk</title>
     <link rel="icon" href="/assets/logo.png">
@@ -26,12 +28,17 @@
         <div class="centered">
             <h3 style="white-space: pre-line;">Welcome back! 
                 Please login to continue using NetTalk.</h3>
+            <label id="error"></label>
+            <br>
             <label for="username">Username:</label>
             <input type="text" id="username" name="Username">
             <br>
             <br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="Password">
+            <br>
+            <br>
+            <button onclick="login(sock,$('#username').val(),$('#password').val())">Login</button>
         </div>
     </section>
     <footer>

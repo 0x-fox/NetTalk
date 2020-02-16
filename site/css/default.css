@@ -39,9 +39,81 @@ a {
     text-decoration: none;
 } 
 
+li a {
+    opacity: 0.5;
+}
+
+li a:hover {
+    opacity: 1;
+}
+
+#error {
+    color:red
+}
+
 .centered {
     margin-top: 200px;
     text-align: center;
+}
+
+.right {
+    text-align: right;
+}
+
+.left {
+    text-align: left;
+}
+
+#mscroll {
+    max-height: 500px;
+    overflow: auto;
+    height: 500px;
+    text-align: left;
+    margin-top: 50px;
+}
+
+.message {
+    margin-left: 125px;
+    padding-left: 10px;
+    margin-right: 125px;
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    white-space: pre-line;
+    border: 3px solid rgb(75, 75, 75);
+    background: rgb(75, 75, 75);
+    border-radius: 8px;
+}
+
+#user-div {
+    margin-top: 5px;
+    padding-right: 30px;
+    max-height: 100px;
+    overflow: hidden;
+    height: 100px;
+    text-align: right;
+}
+
+#user-input {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#message-input {
+    width: 400px;
+    height: 30px;
+    overflow: hidden;
+    resize: none;
+}
+
+#message-button {
+    margin-top: -10px;
+    width: 65px;
+    height: 20px;
+}
+
+#online-users-label {
+    margin-top: -75px;
 }
 
 footer {
@@ -57,6 +129,14 @@ button {
 
 label {
     display: block;
+}
+
+textarea {
+    background: gray;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    display: inline;
 }
 
 input {

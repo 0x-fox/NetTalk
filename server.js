@@ -32,15 +32,23 @@ function saveBanned(banlist) {
     fs.writeFileSync('banned.json', JSON.stringify(banned, null, "\t"));
 }
 
+if(!fs.existsSync("specials.json")){
+    fs.writeFileSync("specials.json", "{}")
+}
+function getSpecials() {
+    return JSON.parse(fs.readFileSync('specials.json'))
+}
+
 function getIP(socket) {
     return socket.handshake.address.replace("::","").replace("ffff:","")
 }
 
 class User {
-    constructor(name, ip, session) {
+    constructor(name, ip, session, sock) {
             this.name = name
             this.ip = ip
             this.session = session
+            this.sock = sock
 
             usersonline.push(this)
     }
@@ -55,6 +63,14 @@ class User {
 
     getsession() {
         return this.session
+    }
+
+    setsocket(sock) {
+        this.sock = sock
+    }
+
+    getsocket() {
+        return this.sock
     }
 
     disconnect() {
@@ -97,18 +113,18 @@ function login(sock, pass) {
     var failed = true
     var hashes = getHashes();
 
-    console.log(pass)
-    
-    for (c_pass of Object.keys(hashes)) {
-        console.log(pass)
+    if(getUserByIP(getIP(sock)) != 0) {
+        getUserByIP(getIP(sock)).disconnect()
+    }
 
+    for (c_pass of Object.keys(hashes)) {
         if (pass == c_pass) {
             failed = false
             var name = hashes[c_pass]
             var name = filterHTML(name)
             var ip = getIP(sock)
             var session = {ip, c_pass}
-            new User(name, ip, session)
+            new User(name, ip, session, sock)
             break
         }
     }
@@ -155,11 +171,21 @@ function sendMessage(sock, message) {
     var user = getUserByIP(getIP(sock))
     if (user == 0)
         return
-    
-    var message = filterHTML(message)
-    var sendedMessage = "<div class='message'>"+user.name+"> <span style='txt'><b>"+message+"</b></span></div>"
 
-    sock.emit("message", sendedMessage)
+    var message = filterHTML(message)
+    if (!message) {return}
+
+    var specials = getSpecials()
+    for (key of Object.keys(specials)) {
+        message = message.replace(key, specials[key])
+    }
+    var sendedMessage = "<div class='message'><b>"+user.name+"</b>\n <span style='txt'>"+message+"</span></div>"
+
+    for (user of usersonline) {
+        if (user.getsocket().connected) {
+            user.getsocket().emit("message", sendedMessage)
+        }
+    }
 }
 
 function checkSession(sock) {
@@ -170,8 +196,23 @@ function checkSession(sock) {
         sock.emit('checkFail')
 }
 
+function getOnlineUsers() {
+    OnlineList = []
+    for (user of usersonline) {
+        if (user.getsocket().connected)
+            OnlineList.push(user.name)
+    }
+
+    return OnlineList
+}
+
+function sendOnlineUsers(sock) {
+    sock.emit("getOnlineUsers", getOnlineUsers())
+}
+
 function eventConnect(sock) {
     var ip = getIP(sock)
+    
     var banlist = getBanned()
     for(i of Object.keys(banlist)){
         i = i.toString()
@@ -184,11 +225,15 @@ function eventConnect(sock) {
         }
     }
 
+    var _u = getUserByIP(ip)
+    if (_u !== 0) {_u.setsocket(sock)}
+
     sock.on('login', function(pass){login(sock, pass)})
     sock.on('destroySession', function(){UserDisconnect(sock)})
     sock.on('register', function(username, pass){register(sock, username, pass)})
     sock.on('message', function(message){sendMessage(sock, message)})
     sock.on('checkSession', function(){checkSession(sock)})
+    sock.on("sendOnlineUsers", function(){sendOnlineUsers(sock)})
 }
 
 io.on('connection',eventConnect)

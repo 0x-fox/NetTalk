@@ -4,14 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/css/default.css">
-    <script src="/js/default.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script>sock = io.connect('http://' + document.domain + ":" + location.port)</script>
+    <script src="/js/default.js"></script>
+    <script>redirectifnotSession(sock, "/"); setInterval(function() {redirectifnotSession(sock, "/")}, 1000)</script>
+    <script>getOnlineUsers(sock); setInterval(function() {getOnlineUsers(sock)}, 1000)</script>
+    <script>messageHandeler(sock)</script>
 
     <title>NetTalk</title>
     <link rel="icon" href="/assets/logo.png">
 </head>
 <body>
-    
+    <header>
+        <h2 class="logo">NetTalk</h2>
+        <nav>
+            <ul>
+                <li><a href="/html/">Home</a></li>
+                <li><a href="/html/login.html">Login</a></li>
+                <li><a href="/html/register.html">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section class="centered">
+        <div id="mscroll">
+            <span id="messages"></span>
+        </div>
+        <div id='user-div' class="right">
+            <div id="user-input" class="left">
+                <textarea id="message-input"></textarea>
+                <br>
+                <button id="message-button" onclick="sendMessage(sock, $('#message-input').val()); $('#message-input').val('')">Send</button>
+            </div>
+            <label id="online-users-label">Online Users:</label>
+            <label id="online-users"></label>
+        </div>
+    </section>
+    <footer>
+    </footer>
+
 </body>
 </html>
