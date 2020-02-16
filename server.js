@@ -260,7 +260,7 @@ function eventConnect(sock) {
     var _u = getUserByIP(ip)
     if (_u !== 0) {_u.setsocket(sock)}
 
-    sock.on('disconnect', function(){leaveVoicechannel(sock)})
+    //sock.on('disconnect', function(){leaveVoicechannel(sock)})
     sock.on('login', function(pass){login(sock, pass)})
     sock.on('destroySession', function(){UserDisconnect(sock)})
     sock.on('register', function(username, pass){register(sock, username, pass)})
