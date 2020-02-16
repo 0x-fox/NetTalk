@@ -10,7 +10,9 @@
     <script src="/js/default.js"></script>
     <script>redirectifnotSession(sock, "/"); setInterval(function() {redirectifnotSession(sock, "/")}, 1000)</script>
     <script>getOnlineUsers(sock); setInterval(function() {getOnlineUsers(sock)}, 1000)</script>
-    <script>messageHandeler(sock)</script>
+    <script>voiceTransmitHandeler(sock); setInterval(function() {voiceTransmitHandeler(sock)}, 100)</script>
+    <script>voiceReciveHandeler(sock)</script>
+    <script>sock.emit("joinVoiceChannel")</script>
 
     <title>NetTalk</title>
     <link rel="icon" href="/assets/logo.png">
@@ -21,25 +23,22 @@
         <nav>
             <ul>
                 <li><a href="/html/">Home</a></li>
+                <li><a href="/html/login.html">Login</a></li>
+                <li><a href="/html/register.html">Register</a></li>
+                <li><a href="/html/voicechat.html">Voicechat</a></li>
             </ul>
         </nav>
     </header>
     <section class="centered">
-        <div id="mscroll">
-            <span id="messages"></span>
-        </div>
+        <label id="online-users-label" style='padding-top: 300px'>Online Users:</label>
+            <label id="online-users"></label>
         <div id='user-div' class="right">
             <div id="user-input" class="left">
-                <textarea id="message-input"></textarea>
-                <br>
-                <button id="message-button" onclick="sendMessage(sock, $('#message-input').val()); $('#message-input').val('')">Send</button>
             </div>
-            <label id="online-users-label">Online Users:</label>
-            <label id="online-users"></label>
         </div>
     </section>
     <footer>
     </footer>
-
+    <audio id="player" autoplay></audio>
 </body>
 </html>

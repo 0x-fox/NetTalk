@@ -49,7 +49,8 @@ class User {
             this.ip = ip
             this.session = session
             this.sock = sock
-
+            
+            //this.leaveVoicechannel()
             usersonline.push(this)
     }
 
@@ -72,6 +73,18 @@ class User {
     getsocket() {
         return this.sock
     }
+
+    /*joinVoicechannel() {
+        this.voicechannel = true
+    }
+
+    leaveVoicechannel() {
+        this.voicechannel = false
+    }
+
+    getVoicechannel() {
+        return this.voicechannel
+    }*/
 
     disconnect() {
         var userindex = usersonline.indexOf(this)
@@ -210,6 +223,28 @@ function sendOnlineUsers(sock) {
     sock.emit("getOnlineUsers", getOnlineUsers())
 }
 
+function sendVoice(sock, stream) {
+    for (user of usersonline) {
+        if (user.getsocket().connected && user.getVoicechannel()) {
+            user.getsocket().emit("getVoice", stream)
+        }
+    }
+}
+
+/*function joinVoiceChannel(sock) {
+    var user = getUserByIP(getIP(sock))
+    if (user !== 0) {
+        user.joinVoicechannel()
+    }
+}
+
+function leaveVoicechannel(sock) {
+    var user = getUserByIP(getIP(sock))
+    if (user !== 0) {
+        user.leaveVoicechannel()
+    }
+}*/
+
 function eventConnect(sock) {
     var ip = getIP(sock)
     
@@ -228,12 +263,15 @@ function eventConnect(sock) {
     var _u = getUserByIP(ip)
     if (_u !== 0) {_u.setsocket(sock)}
 
+    sock.on('disconnect', function(){leaveVoicechannel(sock)})
     sock.on('login', function(pass){login(sock, pass)})
     sock.on('destroySession', function(){UserDisconnect(sock)})
     sock.on('register', function(username, pass){register(sock, username, pass)})
     sock.on('message', function(message){sendMessage(sock, message)})
     sock.on('checkSession', function(){checkSession(sock)})
     sock.on("sendOnlineUsers", function(){sendOnlineUsers(sock)})
+    /*sock.on("sendVoice", function(stream){sendVoice(sock, stream)})
+    sock.on("joinVoiceChannel", function(){joinVoiceChannel(sock)})*/
 }
 
 io.on('connection',eventConnect)
