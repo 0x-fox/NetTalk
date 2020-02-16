@@ -7,7 +7,7 @@
     <script src="/js/default.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <script>sock = io.connect('http://' + document.domain + ":" + location.port)</script>
+    <script>sock = io.connect('https://' + document.domain + ":" + location.port)</script>
     <script>redirectifSession(sock, "/html/chat.html"); setInterval(function() {redirectifSession(sock, "/")}, 1000)</script>
 
     <title>NetTalk</title>
