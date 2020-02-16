@@ -1,0 +1,9 @@
+{
+    "name": "nettalk",
+    "description": "yes",
+    "version": "2.0.0",
+    "engines": {},
+    "scripts": {
+        "start": "npm install express js-sha256 http socket.io path fs; node server.js"
+    }
+}
