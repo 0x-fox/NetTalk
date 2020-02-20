@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script>sock = io.connect('http://' + document.domain + ":" + location.port)</script>
-    <script src="/js/default.js"></script>
+    <script src="/js/site.js"></script>
     <script>redirectifnotSession(sock, "/"); setInterval(function() {redirectifnotSession(sock, "/")}, 1000)</script>
     <script>getOnlineUsers(sock); setInterval(function() {getOnlineUsers(sock)}, 1000)</script>
     <script>voiceTransmitHandeler(sock); setInterval(function() {voiceTransmitHandeler(sock)}, 100)</script>

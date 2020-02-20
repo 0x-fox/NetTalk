@@ -7,39 +7,6 @@ function h_alert(msg) {
 }
 
 //Socket
-
-/*function getMicrophoneDriver() {
-    return navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-}
-
-function voiceTransmitHandeler(sock) {
-    navigator.mediaDevices.getUserMedia(
-        { audio: true, video: false }
-    ).then(
-        function(stream) 
-        {
-            console.log("Sending " + stream)
-            sock.emit(
-            "sendVoice", stream
-            )
-        }
-    )
-}
-
-function voiceReciveHandeler(sock) {
-    sock.on("getVoice", function(stream) {
-        var stream = Object.assign(new MediaStream(), stream)
-        console.log("Reciving "+ stream)
-        var player = document.getElementById("player")
-
-        if (window.URL) {
-            player.srcObject = stream;
-        } else {
-            player.src = stream;
-        }
-    })
-}*/
-
 function redirectifSession(sock, goal) {
     sock.emit("checkSession")
     sock.on("checkSuccess", function() {window.location.replace(goal)})
@@ -50,7 +17,7 @@ function redirectifnotSession(sock, goal) {
     sock.on("checkFail", function() {window.location.replace(goal)})
 }
 
-function getOnlineUsers(sock) {
+function fetchOnlineUsers(sock) {
     sock.emit("sendOnlineUsers")
     sock.on("getOnlineUsers", function(users) {
         var s_users = ""
@@ -98,7 +65,12 @@ function sendMessage(sock, message) {
     sock.emit("message", message)
 }
 
-function messageHandeler(sock) {
+function handleMessage(sock) {
+    sendMessage(sock, $('#message-input').val())
+    $('#message-input').val('')
+}
+
+function initMessageHandler(sock) {
     sock.on('message', function(msg) {
         $("#messages").html($("#messages").html() + msg)
     })

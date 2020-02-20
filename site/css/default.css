@@ -80,9 +80,13 @@ li a:hover {
     padding-top: 5px;
     padding-bottom: 5px;
     white-space: pre-line;
-    border: 3px solid rgb(75, 75, 75);
-    background: rgb(75, 75, 75);
+    border: 3px solid rgb(70, 70, 70);
     border-radius: 8px;
+}
+
+.message:hover {
+    background: rgb(85, 85, 85);
+    border: 3px solid rbg(85, 85, 85);
 }
 
 #user-div {
@@ -121,10 +125,13 @@ footer {
 }
 
 button {
-    background: gray;
-    border: none;
+    background: rgb(70,70,70);
+    border: 3px solid rgb(80,80,80);
     color: white;
     border-radius: 4px;
+}
+button:hover{
+    background: rgb(85,85,85);
 }
 
 label {
